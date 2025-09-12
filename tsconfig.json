@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", // ou ESNext
+    "moduleResolution": "bundler", // important pour Node + TS
+    "module": "ESNext", // dit à TS de générer du code ESM
+    "esModuleInterop": true, // permet d'importer les libs CommonJS (comme Express)
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "dist" // là où ira ton code compilé
+  }
+}
