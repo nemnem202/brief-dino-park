@@ -1,43 +1,15 @@
 import { Router } from "express";
+import routes_connexion from "./routes/routes_connexion";
+import routes_user from "./routes/routes_user";
+import routes_admin from "./routes/routes_admin";
 
 const router = Router();
 
-router.get("/", (_, res) => {
-  console.log("[REQUEST] : home");
-  res.render("home.ejs");
-});
+router.use("/connexion", routes_connexion);
 
-router.get("/board", (req, res) => {
-  res.render("board.ejs");
-});
+router.use("", routes_user);
 
-router.get("/reservations", (_, res) => {
-  res.render("reservation_page.ejs");
-});
-
-router.get("/reservations/:reservation_id", (req, res) => {
-  res.redirect("/payment/" + req.params.reservation_id);
-});
-
-router.get("/payment/:reservation_id", (req, res) => {
-  res.render("payment.ejs", { reservation_id: req.params.reservation_id });
-});
-
-router.get("/sign-up", (_, res) => {
-  res.render("sign_up.ejs");
-});
-
-router.get("/sign-in", (_, res) => {
-  res.render("sign_in.ejs");
-});
-
-router.get("/admin/dino-upload", (_, res) => {
-  res.render("admin/dinosaure_upload.ejs");
-});
-
-router.post("/admin/dino-upload", (req, res) => {
-  res.send(req.body);
-});
+router.use("/admin", routes_admin);
 
 router.use((_, res) => {
   res.render("not_found.ejs");
