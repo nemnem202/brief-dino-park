@@ -16,6 +16,8 @@ console.log("Trying to serve static from:", staticPath);
 console.log("Exists?", fs.existsSync(staticPath));
 app.use(express.static(staticPath)); // <-- c’est ça qui manquait
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 // Router et vues
 app.use(router);
 app.set("view engine", "ejs");

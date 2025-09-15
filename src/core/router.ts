@@ -35,6 +35,10 @@ router.get("/admin/dino-upload", (_, res) => {
   res.render("admin/dinosaure_upload.ejs");
 });
 
+router.post("/admin/dino-upload", (req, res) => {
+  res.send(req.body);
+});
+
 router.use((_, res) => {
   res.render("not_found.ejs");
 });
