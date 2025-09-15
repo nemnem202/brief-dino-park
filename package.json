@@ -3,14 +3,16 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx watch src/core/app.ts"
+    "dev": "concurrently \"tsx watch src/core/app.ts\" \"npm run watch:frontend\"",
+    "build:frontend": "tsc -p tsconfig.frontend.json",
+    "watch:frontend": "tsc -p tsconfig.frontend.json --watch"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "cloudinary": "^2.7.0",
     "dotenv": "^17.2.2",
     "ejs": "^3.1.10",
     "express": "^5.1.0"
@@ -18,6 +20,7 @@
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/node": "^24.3.1",
+    "concurrently": "^9.2.1",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2"
   }

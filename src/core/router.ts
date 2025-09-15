@@ -3,6 +3,7 @@ import { Router } from "express";
 const router = Router();
 
 router.get("/", (_, res) => {
+  console.log("[REQUEST] : home");
   res.render("home.ejs");
 });
 
@@ -28,6 +29,10 @@ router.get("/sign-up", (_, res) => {
 
 router.get("/sign-in", (_, res) => {
   res.render("sign_in.ejs");
+});
+
+router.get("/admin/dino-upload", (_, res) => {
+  res.render("admin/dinosaure_upload.ejs");
 });
 
 router.use((_, res) => {
