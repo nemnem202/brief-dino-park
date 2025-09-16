@@ -3,4 +3,5 @@ export type Dinosaure = {
   regime_dinosaure: string;
   description_dinosaure: string;
   image_dinosaure: string;
+  image_dinosaure_id: string;
 };

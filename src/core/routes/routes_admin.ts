@@ -16,7 +16,7 @@ routes_admin.get(`/dino-upload/${process.env.GATEWAY_CODE}`, (_, res) =>
 routes_admin.post(
   "/dino-upload",
   (req, res, next) => MiddleWare.check_admin_auth(req, res, next),
-  upload.single("dinosaure-img"),
+  upload.single("dinosaure_img"),
   (req, res) => AdminController.dino_post(req, res)
 );
 
