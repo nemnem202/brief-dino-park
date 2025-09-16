@@ -1,8 +1,13 @@
 import { Router } from "express";
 import AdminController from "../../controller/admin_controller";
 import "dotenv/config";
+import { MiddleWare } from "../../libs/middleware";
+import multer from "multer";
 
 const routes_admin = Router();
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 routes_admin.get(`/dino-upload/${process.env.GATEWAY_CODE}`, (_, res) =>
   AdminController.dino_upload_page(_, res)
@@ -10,7 +15,8 @@ routes_admin.get(`/dino-upload/${process.env.GATEWAY_CODE}`, (_, res) =>
 
 routes_admin.post(
   "/dino-upload",
-  (req, res, next) => AdminController.chechAuth(req, res, next),
+  (req, res, next) => MiddleWare.check_admin_auth(req, res, next),
+  upload.single("dinosaure-img"),
   (req, res) => AdminController.dino_post(req, res)
 );
 

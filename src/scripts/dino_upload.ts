@@ -1,42 +1,23 @@
-type DinosaureForm = {
-  name: string;
-  regime: string;
-  description: string;
-  image: File;
-};
-
-const send_data = async (data: DinosaureForm) => {
-  console.log(data);
+const send_data = async (form: HTMLFormElement) => {
+  console.log("[FORM] : try to submit data...");
   try {
+    const form_data = new FormData(form);
     const res = await fetch("/admin/dino-upload", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
+      body: form_data,
     });
-
-    const mssg = await res.json();
-
-    console.log("datta recieved", mssg);
+    const response = await res.json();
+    console.log("[FORM] : json received");
+    console.log(response);
   } catch (e) {
-    console.error("[ ERREUR DE L'ENVOI]", e);
+    console.error("[FORM] : data submit failed...");
+    console.error(e);
   }
 };
 
 const on_submit = async (e: SubmitEvent, form: HTMLFormElement) => {
   e.preventDefault();
-
-  const formData = new FormData(form);
-
-  const data = {
-    name: formData.get("dinosaure-name"),
-    regime: formData.get("dinosaure-regime"),
-    description: formData.get("dinosaure-description"),
-    image: formData.get("dinosaure-img"),
-  } as DinosaureForm;
-
-  send_data(data);
+  send_data(form);
 };
 
 const listen_form = () => {

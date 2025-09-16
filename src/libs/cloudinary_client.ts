@@ -1,4 +1,7 @@
-import { v2 as cloudinary } from "cloudinary";
+import { v2 as cloudinary, UploadApiErrorResponse, UploadApiResponse } from "cloudinary";
+import streamifier from "streamifier";
+import fs from "fs";
+import { error } from "console";
 
 export class CloudinaryClient {
   private static instance: CloudinaryClient | null = null;
@@ -15,10 +18,40 @@ export class CloudinaryClient {
   }
 
   private static init_client() {
-    cloudinary.config({
+    const config = {
       cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
       api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET, // Click 'View API Keys' above to copy your API secret
-    });
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+    };
+    // console.log("[CLOUDINARY CONFIG] : ", config);
+    cloudinary.config(config);
   }
+
+  async upload_img(
+    buffer: Buffer
+  ): Promise<UploadApiResponse | UploadApiErrorResponse | string | any> {
+    try {
+      const result = await new Promise<UploadApiResponse | UploadApiErrorResponse | string>(
+        (resolve) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            { folder: "uploads" }, // dossier optionnel
+            (error, result) => {
+              if (error) return resolve(error);
+              if (!result) return resolve("Unexpected error, no result");
+              resolve(result);
+            }
+          );
+
+          // Convert buffer en stream
+          streamifier.createReadStream(buffer).pipe(uploadStream);
+        }
+      );
+
+      return result;
+    } catch (err) {
+      return err;
+    }
+  }
+
+  async get_img(url: string) {}
 }
