@@ -22,6 +22,8 @@ export default class AdminController {
     const img_url = this.handle_image(req);
 
     if (!img_url) return res.status(500);
+
+    res.send({ messae: "Upload successful !" }).status(200);
   }
 
   private static async handle_image(req: Request): Promise<void | string> {
