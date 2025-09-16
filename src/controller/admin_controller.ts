@@ -4,8 +4,11 @@ import { CloudinaryClient } from "../libs/cloudinary_client";
 import { UploadApiErrorResponse, UploadApiResponse } from "cloudinary";
 import { Dinosaure } from "../types/models/dinosaure";
 import { z } from "zod";
+import DinoRepository from "../repositories/dino_repository";
 
 export default class AdminController {
+  private static dino_repo = new DinoRepository();
+
   private static dino_schema = z.object({
     dinosaure_name: z
       .string()
@@ -52,7 +55,16 @@ export default class AdminController {
         description_dinosaure: parsed_body.dinosaure_description,
         regime_dinosaure: parsed_body.dinosaure_regime,
       };
-      return res.status(200).send({ message: dino });
+
+      const dino_add = await this.dino_repo.add_item(dino);
+
+      if (dino_add) {
+        const all_dino = await this.dino_repo.findAll();
+        console.log("[UPDATE DINO] : ", all_dino);
+        return res.status(200).send({ message: dino });
+      } else {
+        return res.status(500).send({ message: "erreur de la db" });
+      }
     } catch (err) {
       console.error("[ERROR] : " + err);
       if (err instanceof z.ZodError) {
