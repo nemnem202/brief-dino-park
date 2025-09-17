@@ -4,10 +4,11 @@
   <h2><%- dino.nom_dinosaure %></h2>
   <p><%- dino.description_dinosaure %></p>
   <p><%- dino.regime_dinosaure %></p>
+  <p><%- dino.id %></p>
 
   <button
     onclick="
-      fetch('/admin/remove_dino/<%= dino.id %>');
+      fetch('/admin/remove_dino/<%= dino.id%>').then((res)=>console.log(res.status));
     "
   >
     supprimer X

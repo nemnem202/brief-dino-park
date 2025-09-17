@@ -4,9 +4,11 @@
   <p><%- billet.description_billet %></p>
   <p>Prix: <%- billet.prix_billet %></p>
   <p>Age minimum: <%- billet.age_minimum %> ans</p>
+  <p><%- billet.id %></p>
   <button
     onclick="
       fetch('/admin/remove_billet/<%= billet.id %>');
+      window.location.reload()
     "
   >
     supprimer X

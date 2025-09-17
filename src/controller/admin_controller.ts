@@ -130,11 +130,12 @@ export default class AdminController {
   }
 
   static async remove_dino(req: Request, res: Response) {
+    console.log("[REMOVE DINO ATTEMPT]");
     const id = req.params.id;
     if (!id) return res.status(404);
 
     this.dino_repo.get_prop_by_key(parseInt(id), "image_dinosaure_id").then(async (img_id) => {
-      if (!img_id) return;
+      if (!img_id) return res.status(400);
       console.log("[REMOVE IMG ATTEMPT] : for", img_id);
       const remove_img = await CloudinaryClient.getInstance().remove_img(img_id);
       console.log("[REMOVE IMG] : ", remove_img);
@@ -145,6 +146,7 @@ export default class AdminController {
       console.log("[DINOSAURE REMOVED] : ", id);
       return res.status(200).send({ message: "dino removed !" });
     } else {
+      console.log("[REMOVE DINO] : fail");
       return res.status(400).send({ message: "an error occured" });
     }
   }
@@ -197,6 +199,7 @@ export default class AdminController {
   }
 
   static async remove_billet(req: Request, res: Response) {
+    console.log("[REMOVE BILLET ATTEMPT]");
     const id = req.params.id;
     if (!id) return res.status(404);
 
