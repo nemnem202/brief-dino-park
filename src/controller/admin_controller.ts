@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import AdminCookieGen from "../libs/admin_cookie_gen";
 import { CloudinaryClient } from "../libs/cloudinary_client";
 import { UploadApiErrorResponse, UploadApiResponse } from "cloudinary";
-import { Dinosaure } from "../types/models/dinosaure";
 import { z } from "zod";
 import DinoRepository from "../repositories/dino_repository";
+import { DinosaureDTO, DinosaureEntity } from "../types/models/dinosaure";
 
 export default class AdminController {
   private static dino_repo = new DinoRepository();
@@ -24,17 +24,7 @@ export default class AdminController {
       .max(300, "Le régime est trop long, max 300 charactères !"),
   });
 
-  static async dino_upload_page(_: Request, res: Response) {
-    const token = await AdminCookieGen.generate_token();
-    if (!token) {
-      res.status(500).send("une erreur est survenue");
-      return;
-    }
-    res.cookie("admin_token", token, {
-      httpOnly: true,
-      secure: false,
-      maxAge: 1000 * 60 * 60,
-    });
+  static dino_upload_page(_: Request, res: Response) {
     res.render("admin/dinosaure_upload.ejs");
   }
 
@@ -48,7 +38,7 @@ export default class AdminController {
         return res.status(400).send({ message: "Please enter a correct image" });
       }
 
-      const dino: Dinosaure = {
+      const dino: DinosaureDTO = {
         image_dinosaure: img_properties.url,
         image_dinosaure_id: img_properties.id,
         nom_dinosaure: parsed_body.dinosaure_name,
@@ -94,6 +84,41 @@ export default class AdminController {
     } else {
       console.log("[IMAGE UPLOAD SUCCESSFULLY]", response.secure_url);
       return { url: response.secure_url, id: response.public_id };
+    }
+  }
+
+  static async get_gateway_cookie(_: Request, res: Response) {
+    const token = await AdminCookieGen.generate_token();
+    if (!token) {
+      res.status(500).send("une erreur est survenue");
+      return;
+    }
+    res
+      .cookie("admin_token", token, {
+        httpOnly: true,
+        secure: false,
+        maxAge: 1000 * 60 * 60,
+      })
+      .redirect("/admin/board");
+  }
+
+  static async board_page(_: Request, res: Response) {
+    const repo = new DinoRepository();
+    let dinos = await repo.findAll();
+    if (!dinos) dinos = [];
+    res.render("admin/board.ejs", { dinos: dinos });
+  }
+
+  static async remove_dino(req: Request, res: Response) {
+    const id = req.params.id;
+    if (!id) return res.status(404);
+    const repo = new DinoRepository();
+    const removed = await repo.remove_item(parseInt(id));
+    if (removed) {
+      console.log("[DINOSAURE REMOVED] : ", id);
+      return res.status(200).send({ message: "dino removed !" });
+    } else {
+      return res.status(400).send({ message: "an error occured" });
     }
   }
 }

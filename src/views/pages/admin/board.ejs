@@ -1,0 +1,3 @@
+<a href="/admin/dino-upload">New Dino</a>
+<h1>Dinosaures:</h1>
+<% for (const d of dinos) { %> <%- include('../../partials/dino_card.ejs', { dino: d }) %> <% } %>

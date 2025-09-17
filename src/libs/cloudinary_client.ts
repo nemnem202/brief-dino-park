@@ -1,7 +1,5 @@
 import { v2 as cloudinary, UploadApiErrorResponse, UploadApiResponse } from "cloudinary";
 import streamifier from "streamifier";
-import fs from "fs";
-import { error } from "console";
 
 export class CloudinaryClient {
   private static instance: CloudinaryClient | null = null;
@@ -34,7 +32,10 @@ export class CloudinaryClient {
       const result = await new Promise<UploadApiResponse | UploadApiErrorResponse | string>(
         (resolve) => {
           const uploadStream = cloudinary.uploader.upload_stream(
-            { folder: "uploads" }, // dossier optionnel
+            {
+              folder: "uploads",
+              transformation: [{ width: 300, height: 300, crop: "fill" }],
+            },
             (error, result) => {
               if (error) return resolve(error);
               if (!result) return resolve("Unexpected error, no result");
@@ -42,16 +43,12 @@ export class CloudinaryClient {
             }
           );
 
-          // Convert buffer en stream
           streamifier.createReadStream(buffer).pipe(uploadStream);
         }
       );
-
       return result;
     } catch (err) {
       return err;
     }
   }
-
-  async get_img(url: string) {}
 }

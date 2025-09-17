@@ -2,16 +2,16 @@ import { Pool } from "pg";
 import Database from "../validation/database";
 import { TablesNames } from "../types/tables_names";
 
-export default abstract class Repository<T extends Object> {
+export default abstract class Repository<DTO extends Object, Entity extends object> {
   protected pool: Pool;
   protected abstract tableName: TablesNames;
-  protected abstract fromRow(row: unknown): T;
+  protected abstract fromRow(row: unknown): Entity;
 
   constructor() {
     this.pool = Database.getPool();
   }
 
-  findAll = async (): Promise<T[] | null> => {
+  findAll = async (): Promise<Entity[] | null> => {
     const query = {
       name: `fetch-all-${this.tableName}`,
       text: `select * from ${this.tableName}`,
@@ -29,13 +29,11 @@ export default abstract class Repository<T extends Object> {
     }
   };
 
-  add_item = async (item: T): Promise<boolean> => {
+  add_item = async (item: DTO): Promise<boolean> => {
     try {
-      // Récupère toutes les clés et valeurs de l'objet
       const keys = Object.keys(item);
       const values = Object.values(item);
 
-      // Crée les placeholders pour PostgreSQL ($1, $2, ...)
       const placeholders = keys.map((_, index) => `$${index + 1}`);
 
       const query = {
@@ -49,6 +47,21 @@ export default abstract class Repository<T extends Object> {
       return true;
     } catch (error) {
       console.error("Erreur lors de l'ajout :", error);
+      return false;
+    }
+  };
+
+  remove_item = async (id: number): Promise<boolean> => {
+    try {
+      const query = {
+        text: `DELETE FROM ${this.tableName} WHERE id = $1`,
+        values: [id],
+      };
+
+      const result = await this.pool.query(query);
+      return (result.rowCount ?? 0) > 0;
+    } catch (error) {
+      console.error("Erreur lors de la suppression :", error);
       return false;
     }
   };

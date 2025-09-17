@@ -1,8 +1,8 @@
 import Repository from "../libs/repository";
-import { Dinosaure } from "../types/models/dinosaure";
+import { DinosaureDTO, DinosaureEntity } from "../types/models/dinosaure";
 import { TablesNames } from "../types/tables_names";
 
-export default class DinoRepository extends Repository<Dinosaure> {
+export default class DinoRepository extends Repository<DinosaureDTO, DinosaureEntity> {
   protected tableName: TablesNames = "Dinosaure";
-  protected fromRow = (row: Dinosaure): Dinosaure => row;
+  protected fromRow = (row: DinosaureEntity): DinosaureEntity => row;
 }

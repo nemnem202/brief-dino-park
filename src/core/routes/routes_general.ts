@@ -10,3 +10,5 @@ general_routes.get("/", (_, res) => {
 general_routes.get("/reservations", (_, res) => {
   res.render("reservation_page.ejs");
 });
+
+export default general_routes;

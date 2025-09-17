@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<div class="dino-card-container">
+  <img src="<%- dino.image_dinosaure %>" alt="image-of-<%- dino.nom_dinosaure %>" />
+  <h2><%- dino.nom_dinosaure %></h2>
+  <p><%- dino.description_dinosaure %></p>
+  <p><%- dino.regime_dinosaure %></p>
+
+  <button
+    onclick="
+      fetch('/admin/remove_dino/<%= dino.id %>');
+    "
+  >
+    supprimer X
+  </button>
+</div>

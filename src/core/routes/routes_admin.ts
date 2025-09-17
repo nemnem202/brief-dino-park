@@ -9,8 +9,14 @@ const routes_admin = Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-routes_admin.get(`/dino-upload/${process.env.GATEWAY_CODE}`, (_, res) =>
-  AdminController.dino_upload_page(_, res)
+routes_admin.get(
+  `/dino-upload`,
+  (req, res, next) => MiddleWare.check_admin_auth(req, res, next),
+  (_, res) => AdminController.dino_upload_page(_, res)
+);
+
+routes_admin.get(`/gateway/${process.env.GATEWAY_CODE}`, (req, res) =>
+  AdminController.get_gateway_cookie(req, res)
 );
 
 routes_admin.post(
@@ -20,8 +26,16 @@ routes_admin.post(
   (req, res) => AdminController.dino_post(req, res)
 );
 
-routes_admin.get("/board", (req, res) => {
-  res.render("board.ejs");
-});
+routes_admin.get(
+  "/board",
+  (req, res, next) => MiddleWare.check_admin_auth(req, res, next),
+  (_, res) => AdminController.board_page(_, res)
+);
+
+routes_admin.get(
+  "/remove_dino/:id",
+  (req, res, next) => MiddleWare.check_admin_auth(req, res, next),
+  (req, res) => AdminController.remove_dino(req, res)
+);
 
 export default routes_admin;
