@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import AdminCookieGen from "../libs/admin_cookie_gen";
 import { CloudinaryClient } from "../libs/cloudinary_client";
 import { UploadApiErrorResponse, UploadApiResponse } from "cloudinary";
 import { z } from "zod";
@@ -7,6 +6,7 @@ import DinoRepository from "../repositories/dino_repository";
 import { DinosaureDTO, DinosaureEntity } from "../types/models/dinosaure";
 import { BilletDTO } from "../types/models/billet";
 import { BilletRepository } from "../repositories/billet_repository";
+import CookieGen from "../libs/cookie_gen";
 
 export default class AdminController {
   private static dino_repo = new DinoRepository();
@@ -107,7 +107,7 @@ export default class AdminController {
   }
 
   static async get_gateway_cookie(_: Request, res: Response) {
-    const token = await AdminCookieGen.generate_token();
+    const token = await CookieGen.generate_admin_token();
     if (!token) {
       res.status(500).send("une erreur est survenue");
       return;

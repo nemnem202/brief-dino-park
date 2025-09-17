@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import AdminCookieGen from "./admin_cookie_gen";
+import CookieGen from "./cookie_gen";
 
 export class MiddleWare {
   static async check_admin_auth(req: Request, res: Response, next: NextFunction) {
     try {
       const token = req.cookies.admin_token;
-      const auth = await AdminCookieGen.verify_token(token);
+      const auth = await CookieGen.verify_admin_token(token);
       if (!auth) {
         res.status(400);
         res.send({ message: "failed to auth" });

@@ -29,7 +29,7 @@ export default abstract class Repository<DTO extends Object, Entity extends obje
     }
   };
 
-  add_item = async (item: DTO): Promise<boolean> => {
+  add_item = async (item: DTO): Promise<Entity | null> => {
     try {
       const keys = Object.keys(item);
       const values = Object.values(item);
@@ -38,16 +38,17 @@ export default abstract class Repository<DTO extends Object, Entity extends obje
 
       const query = {
         text: `INSERT INTO ${this.tableName} (${keys.join(", ")})
-             VALUES (${placeholders.join(", ")})`,
+         VALUES (${placeholders.join(", ")})
+         RETURNING *`,
         values,
       };
 
-      await this.pool.query(query);
+      const query_result = await this.pool.query<Entity>(query);
 
-      return true;
+      return query_result.rows[0] ?? null;
     } catch (error) {
       console.error("Erreur lors de l'ajout :", error);
-      return false;
+      return null;
     }
   };
 
