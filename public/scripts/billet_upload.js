@@ -1,9 +1,11 @@
 "use strict";
+let dino_id_array = [];
 const billet_upload = () => {
     const send_data = async (form) => {
         console.log("[FORM] : try to submit data...");
         try {
             const form_data = new FormData(form);
+            form_data.append("dino_id_array", JSON.stringify(dino_id_array));
             const res = await fetch("/admin/billet-upload", {
                 method: "POST",
                 body: form_data,
@@ -28,6 +30,17 @@ const billet_upload = () => {
             return;
         }
         form.addEventListener("submit", (e) => on_submit(e, form));
+        const checkboxes = document.querySelectorAll(".dino-checkbox").forEach((d) => {
+            d.addEventListener("change", (e) => {
+                if (d.checked && !dino_id_array.includes(d.value)) {
+                    dino_id_array.push(d.value);
+                }
+                else {
+                    dino_id_array = dino_id_array.filter((e) => e !== d.value);
+                }
+                console.log(dino_id_array);
+            });
+        });
     };
     listen_form();
 };

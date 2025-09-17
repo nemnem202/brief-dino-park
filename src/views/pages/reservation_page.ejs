@@ -1,1 +1,5 @@
-<div>reservation page</div>
+<h1>Réservez</h1>
+
+<h1>Billets :</h1>
+<!-- prettier-ignore -->
+<% for (const b of billets) { %> <%- include('../partials/billet_card.ejs', { billet: b }) %> <% } %>

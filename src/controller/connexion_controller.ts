@@ -50,4 +50,22 @@ export default class ConnexionController {
       return res.status(400).send({ message: err });
     }
   }
+
+  static async sign_up(req: Request, res: Response) {
+    try {
+      const parsed_body = this.user_schema.parse(req.body);
+      const users = await this.user_repo.findAll();
+      if (!users) return res.status(500);
+      const target = users.find((u) => u.email === parsed_body.email);
+      if (!target) return res.status(404);
+      const auth = await argon2.verify(parsed_body.password, target.mot_de_passe);
+
+      if (auth) {
+        console.log("[USER IS AUTHENTIFIED]");
+      } else {
+        console.log("[USER FAILED TO AUTH]");
+        return res.status(404);
+      }
+    } catch (err) {}
+  }
 }

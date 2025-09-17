@@ -5,6 +5,11 @@
   <p>Prix: <%- billet.prix_billet %></p>
   <p>Age minimum: <%- billet.age_minimum %> ans</p>
   <p><%- billet.id %></p>
+
+  <% dinos.forEach(dino => { %> <% if (voir_dino.some(v => v.code_dinosaure ===dino.id)) { %>
+  <div>voir dino: <%= dino.nom_dinosaure %></div>
+  <% } %> <% }) %>
+
   <button
     onclick="
       fetch('/admin/remove_billet/<%= billet.id %>');

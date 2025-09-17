@@ -4,13 +4,16 @@ import { UploadApiErrorResponse, UploadApiResponse } from "cloudinary";
 import { z } from "zod";
 import DinoRepository from "../repositories/dino_repository";
 import { DinosaureDTO, DinosaureEntity } from "../types/models/dinosaure";
-import { BilletDTO } from "../types/models/billet";
+import { BilletDTO, BilletEntity } from "../types/models/billet";
 import { BilletRepository } from "../repositories/billet_repository";
 import CookieGen from "../libs/cookie_gen";
+import { VoirDinoRepository } from "../repositories/voir_dino_repository";
+import { Voir_DinosaureEntity, VoirDinosaureDTO } from "../types/models/voir_dinosaure";
 
 export default class AdminController {
   private static dino_repo = new DinoRepository();
   private static billet_repo = new BilletRepository();
+  private static voir_dino_repo = new VoirDinoRepository();
 
   private static dino_schema = z.object({
     dinosaure_name: z
@@ -39,6 +42,16 @@ export default class AdminController {
     prix_billet: z.coerce.number().refine((val) => /^\d{1,13}(\.\d{1,2})?$/.test(val.toString()), {
       message: "Le prix doit comporter jusqu'à 15 chiffres au total, dont 2 décimales maximum",
     }),
+    dino_id_array: z
+      .string()
+      .transform((val) => {
+        try {
+          return JSON.parse(val);
+        } catch {
+          return [];
+        }
+      })
+      .pipe(z.array(z.string())),
 
     age_minimum: z.coerce.number().int("L'âge minimum doit être un entier"),
   });
@@ -122,11 +135,10 @@ export default class AdminController {
   }
 
   static async board_page(_: Request, res: Response) {
-    let dinos = await this.dino_repo.findAll();
-    let billets = await this.billet_repo.findAll();
-    if (!dinos) dinos = [];
-    if (!billets) billets = [];
-    res.render("admin/board.ejs", { dinos: dinos, billets: billets });
+    const dinos: DinosaureEntity[] = (await this.dino_repo.findAll()) ?? [];
+    const billets: BilletEntity[] = (await this.billet_repo.findAll()) ?? [];
+    const voir_dino: Voir_DinosaureEntity[] = (await this.voir_dino_repo.findAll()) ?? [];
+    res.render("admin/board.ejs", { dinos: dinos, billets: billets, voir_dino: voir_dino });
   }
 
   static async remove_dino(req: Request, res: Response) {
@@ -151,8 +163,9 @@ export default class AdminController {
     }
   }
 
-  static billet_upload_page(_: Request, res: Response) {
-    res.render("admin/billet_upload.ejs");
+  static async billet_upload_page(_: Request, res: Response) {
+    const dinos = (await this.dino_repo.findAll()) ?? [];
+    res.render("admin/billet_upload.ejs", { dinos: dinos });
   }
 
   static async billet_post(req: Request, res: Response) {
@@ -178,8 +191,15 @@ export default class AdminController {
       const billet_add = await this.billet_repo.add_item(billet);
 
       if (billet_add) {
-        const all_billets = await this.billet_repo.findAll();
-        console.log("[UPDATE BILLET] : ", all_billets);
+        parsed_body.dino_id_array.forEach((e) => {
+          const item: VoirDinosaureDTO = {
+            code_billet: String(billet_add.id),
+            code_dinosaure: e,
+          };
+          this.voir_dino_repo.add_item(item);
+        });
+
+        console.log("[UPDATE BILLET] : ", billet_add);
         return res.status(200).send({ message: billet });
       } else {
         return res.status(500).send({ message: "erreur de la db" });
@@ -211,9 +231,17 @@ export default class AdminController {
     });
 
     const removed = await this.billet_repo.remove_item(parseInt(id));
+
     if (removed) {
       console.log("[BILLET REMOVED] : ", id);
-      return res.status(200).send({ message: "billet removed !" });
+      const all_voir_dino = await this.voir_dino_repo.findAll();
+      res.status(200).send({ message: "billet removed !" });
+      if (all_voir_dino) {
+        const voir_dino_for_billet = all_voir_dino.filter((e) => e.code_billet === id);
+        voir_dino_for_billet.forEach((e) =>
+          this.voir_dino_repo.remove_item(parseInt(String(e.id)))
+        );
+      }
     } else {
       return res.status(400).send({ message: "an error occured" });
     }

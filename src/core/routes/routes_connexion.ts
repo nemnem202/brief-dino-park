@@ -1,6 +1,5 @@
 import { Router } from "express";
 import ConnexionController from "../../controller/connexion_controller";
-import multer from "multer";
 
 const routes_connexion = Router();
 
@@ -13,5 +12,7 @@ routes_connexion.get("/sign-in", (_, res) => {
 });
 
 routes_connexion.post("/sign-in", (req, res) => ConnexionController.sign_in(req, res));
+
+routes_connexion.post("/sign_up", (req, res) => ConnexionController.sign_up(req, res));
 
 export default routes_connexion;

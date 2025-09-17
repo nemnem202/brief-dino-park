@@ -14,6 +14,13 @@
   <input type="number" id="age-minimum" name="age_minimum" value="0" />
   <label for="image">image du billet</label>
   <input type="file" accept=".png, .jpg, .jpeg" id="billet-img" name="billet_img" />
+  <h3>Dinosaures:</h3>
+  <% for(let i = 0; i < dinos.length; i++) { %>
+  <label>
+    <input type="checkbox" class="dino-checkbox" value="<%= dinos[i].id %>" />
+    <%= dinos[i].nom_dinosaure %> </label
+  ><br />
+  <% } %>
   <button type="submit">Envoyer</button>
 </form>
 

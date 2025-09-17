@@ -7,4 +7,4 @@ export type BilletDTO = {
   image_billet_id: string;
 };
 
-export type BilletEntity = BilletDTO & { code_billet: number };
+export type BilletEntity = BilletDTO & { id: number | string };

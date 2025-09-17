@@ -1,1 +1,8 @@
-<div>home page</div>
+<%- include('../partials/header.ejs') %>
+
+<h1>Dinosaures:</h1>
+<% for (const d of dinos) { %> <%- include('../partials/dino_card.ejs', { dino: d }) %> <% } %>
+
+<h1>Billets :</h1>
+<!-- prettier-ignore -->
+<% for (const b of billets) { %> <%- include('../partials/billet_card.ejs', { billet: b, dinos:dinos, voir_dino:voir_dino }) %> <% } %>
