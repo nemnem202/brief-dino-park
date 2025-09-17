@@ -1,0 +1,13 @@
+<div class="tarif-container">
+  <div>Titre: <%= tarif.titre_tarif %></div>
+  <div>Coefficient: <%= tarif.coefficient_tarif %></div>
+
+  <button
+    onclick="
+      fetch('/admin/remove_tarif/<%= tarif.id %>');
+      window.location.reload()
+    "
+  >
+    supprimer X
+  </button>
+</div>

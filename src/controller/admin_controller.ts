@@ -9,11 +9,14 @@ import { BilletRepository } from "../repositories/billet_repository";
 import CookieGen from "../libs/cookie_gen";
 import { VoirDinoRepository } from "../repositories/voir_dino_repository";
 import { Voir_DinosaureEntity, VoirDinosaureDTO } from "../types/models/voir_dinosaure";
+import { TarifRepository } from "../repositories/tarif_repository";
+import { TarifDTO, TarifEntity } from "../types/models/tarif";
 
 export default class AdminController {
   private static dino_repo = new DinoRepository();
   private static billet_repo = new BilletRepository();
   private static voir_dino_repo = new VoirDinoRepository();
+  private static tarif_repo = new TarifRepository();
 
   private static dino_schema = z.object({
     dinosaure_name: z
@@ -54,6 +57,15 @@ export default class AdminController {
       .pipe(z.array(z.string())),
 
     age_minimum: z.coerce.number().int("L'âge minimum doit être un entier"),
+  });
+
+  private static tarif_schema = z.object({
+    titre_tarif: z.string().min(1).max(50),
+    coefficient_tarif: z.coerce
+      .number()
+      .refine((val) => /^\d{1,13}(\.\d{1,2})?$/.test(val.toString()), {
+        message: "Le prix doit comporter jusqu'à 15 chiffres au total, dont 2 décimales maximum",
+      }),
   });
 
   static dino_upload_page(_: Request, res: Response) {
@@ -138,7 +150,13 @@ export default class AdminController {
     const dinos: DinosaureEntity[] = (await this.dino_repo.findAll()) ?? [];
     const billets: BilletEntity[] = (await this.billet_repo.findAll()) ?? [];
     const voir_dino: Voir_DinosaureEntity[] = (await this.voir_dino_repo.findAll()) ?? [];
-    res.render("admin/board.ejs", { dinos: dinos, billets: billets, voir_dino: voir_dino });
+    const tarifs: TarifEntity[] = (await this.tarif_repo.findAll()) ?? [];
+    res.render("admin/board.ejs", {
+      dinos: dinos,
+      billets: billets,
+      voir_dino: voir_dino,
+      tarifs: tarifs,
+    });
   }
 
   static async remove_dino(req: Request, res: Response) {
@@ -244,6 +262,55 @@ export default class AdminController {
       }
     } else {
       return res.status(400).send({ message: "an error occured" });
+    }
+  }
+
+  static async tarif_upload_page(_: Request, res: Response) {
+    res.render("admin/tarif_upload.ejs");
+  }
+
+  static async tarif_post(req: Request, res: Response) {
+    try {
+      const parsed_body = this.tarif_schema.parse(req.body);
+
+      const tarif: TarifDTO = {
+        titre_tarif: parsed_body.titre_tarif,
+        coefficient_tarif: String(parsed_body.coefficient_tarif),
+      };
+
+      const tarif_entity = await this.tarif_repo.add_item(tarif);
+
+      res.send({ message: tarif_entity });
+    } catch (err) {
+      console.error("[ERROR] : " + err);
+      if (err instanceof z.ZodError) {
+        return res.status(400).send({
+          message: "Validation échouée",
+          errors: err.issues,
+          messages: err.issues.map((e) => e.message),
+        });
+      }
+      return res.status(400).send({ message: err });
+    }
+  }
+
+  static async remove_tarif(req: Request, res: Response) {
+    console.log("[TRY TO REMOVE TARIF]");
+    const id = req.params.id;
+
+    if (!id) return res.status(404);
+
+    try {
+      const remove = await this.tarif_repo.remove_item(parseInt(id));
+      if (!remove) {
+        console.log("[FAILED TO REMOVE]");
+        return res.status(404);
+      }
+      console.log("[TARIF REMOVED SUCCESSFULLY]");
+      return res.status(200);
+    } catch (err) {
+      console.log("[ERROR REMOVING THE TARIF]", err);
+      return res.status(500);
     }
   }
 }

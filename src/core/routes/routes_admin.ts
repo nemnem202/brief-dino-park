@@ -57,4 +57,22 @@ routes_admin.get(
   (req, res) => AdminController.remove_billet(req, res)
 );
 
+routes_admin.get(
+  "/tarif-upload",
+  (req, res, next) => MiddleWare.check_admin_auth(req, res, next),
+  (_, res) => AdminController.tarif_upload_page(_, res)
+);
+
+routes_admin.post(
+  "/tarif-upload",
+  (req, res, next) => MiddleWare.check_admin_auth(req, res, next),
+  (req, res) => AdminController.tarif_post(req, res)
+);
+
+routes_admin.get(
+  "/remove_tarif/:id",
+  (req, res, next) => MiddleWare.check_admin_auth(req, res, next),
+  (req, res) => AdminController.remove_tarif(req, res)
+);
+
 export default routes_admin;
