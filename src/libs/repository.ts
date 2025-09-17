@@ -65,4 +65,22 @@ export default abstract class Repository<DTO extends Object, Entity extends obje
       return false;
     }
   };
+
+  get_prop_by_key = async (id: number, prop: keyof Entity): Promise<string | null> => {
+    const query = {
+      text: `SELECT ${String(prop)} FROM ${this.tableName} WHERE id = $1`,
+      values: [id],
+    };
+
+    try {
+      const result = await this.pool.query(query);
+      if (result.rows.length > 0) {
+        return result.rows[0][prop as string];
+      }
+      return null;
+    } catch (error) {
+      console.error(`Erreur lors de la récupération de la propriété ${String(prop)} :`, error);
+      return null;
+    }
+  };
 }

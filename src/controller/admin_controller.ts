@@ -113,6 +113,14 @@ export default class AdminController {
     const id = req.params.id;
     if (!id) return res.status(404);
     const repo = new DinoRepository();
+
+    repo.get_prop_by_key(parseInt(id), "image_dinosaure_id").then(async (img_id) => {
+      if (!img_id) return;
+      console.log("[REMOVE IMG ATTEMPT] : for", img_id);
+      const remove_img = await CloudinaryClient.getInstance().remove_img(img_id);
+      console.log("[REMOVE IMG] : ", remove_img);
+    });
+
     const removed = await repo.remove_item(parseInt(id));
     if (removed) {
       console.log("[DINOSAURE REMOVED] : ", id);

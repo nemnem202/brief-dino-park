@@ -51,4 +51,17 @@ export class CloudinaryClient {
       return err;
     }
   }
+
+  async remove_img(id: string) {
+    try {
+      const result = await new Promise<any>((resolve) => {
+        const remove = cloudinary.uploader.destroy(id);
+        return resolve(remove);
+      });
+
+      return result;
+    } catch (err) {
+      return err;
+    }
+  }
 }
