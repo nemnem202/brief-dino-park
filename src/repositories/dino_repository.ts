@@ -4,5 +4,4 @@ import { TablesNames } from "../types/tables_names";
 
 export default class DinoRepository extends Repository<DinosaureDTO, DinosaureEntity> {
   protected tableName: TablesNames = "Dinosaure";
-  protected fromRow = (row: DinosaureEntity): DinosaureEntity => row;
 }

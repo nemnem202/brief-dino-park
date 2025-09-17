@@ -1,0 +1,20 @@
+<form id="billet-form">
+  <label for="titre-billet">titre du billet</label>
+  <input type="text" id="titre-billet" name="titre_billet" value="Jurrassique" />
+  <label for="descripiton-billet">description du billet</label>
+  <input
+    type="text"
+    id="description-billet"
+    name="description_billet"
+    value="Plongez dans une époque lointaine"
+  />
+  <label for="prix-billet">Prix du billet</label>
+  <input type="number" id="prix-billet" name="prix_billet" value="5" />
+  <label for="age-minimum">Age minimum</label>
+  <input type="number" id="age-minimum" name="age_minimum" value="0" />
+  <label for="image">image du billet</label>
+  <input type="file" accept=".png, .jpg, .jpeg" id="billet-img" name="billet_img" />
+  <button type="submit">Envoyer</button>
+</form>
+
+<script src="../../scripts/billet_upload.js"></script>

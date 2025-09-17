@@ -1,8 +1,10 @@
-export type Billet = {
+export type BilletDTO = {
   titre_billet: string;
   description_billet: string;
-  prix_billet: string;
-  age_minimum: string;
+  prix_billet: number;
+  age_minimum: number;
   image_billet: string;
-  code_tarif: string;
+  image_billet_id: string;
 };
+
+export type BilletEntity = BilletDTO & { code_billet: number };

@@ -1,9 +1,9 @@
-const dino_upload = () => {
+const billet_upload = () => {
   const send_data = async (form: HTMLFormElement) => {
     console.log("[FORM] : try to submit data...");
     try {
       const form_data = new FormData(form);
-      const res = await fetch("/admin/dino-upload", {
+      const res = await fetch("/admin/billet-upload", {
         method: "POST",
         body: form_data,
       });
@@ -22,7 +22,7 @@ const dino_upload = () => {
   };
 
   const listen_form = () => {
-    const form = document.getElementById("dino-form") as HTMLFormElement;
+    const form = document.getElementById("billet-form") as HTMLFormElement;
     if (!form) {
       window.alert("an error occured, try reload the page");
       return;
@@ -34,4 +34,4 @@ const dino_upload = () => {
   listen_form();
 };
 
-dino_upload();
+billet_upload();

@@ -5,9 +5,12 @@ import { UploadApiErrorResponse, UploadApiResponse } from "cloudinary";
 import { z } from "zod";
 import DinoRepository from "../repositories/dino_repository";
 import { DinosaureDTO, DinosaureEntity } from "../types/models/dinosaure";
+import { BilletDTO } from "../types/models/billet";
+import { BilletRepository } from "../repositories/billet_repository";
 
 export default class AdminController {
   private static dino_repo = new DinoRepository();
+  private static billet_repo = new BilletRepository();
 
   private static dino_schema = z.object({
     dinosaure_name: z
@@ -22,6 +25,22 @@ export default class AdminController {
       .string()
       .min(1, "Le régime est requis")
       .max(300, "Le régime est trop long, max 300 charactères !"),
+  });
+
+  private static billet_schema = z.object({
+    titre_billet: z
+      .string()
+      .min(1, "Le titre est requis")
+      .max(100, "Le titre est trop long, max 100 caractères"),
+    description_billet: z
+      .string()
+      .min(1, "La description est requise")
+      .max(1000, "La description est trop longue, max 1000 caractères"),
+    prix_billet: z.coerce.number().refine((val) => /^\d{1,13}(\.\d{1,2})?$/.test(val.toString()), {
+      message: "Le prix doit comporter jusqu'à 15 chiffres au total, dont 2 décimales maximum",
+    }),
+
+    age_minimum: z.coerce.number().int("L'âge minimum doit être un entier"),
   });
 
   static dino_upload_page(_: Request, res: Response) {
@@ -103,28 +122,95 @@ export default class AdminController {
   }
 
   static async board_page(_: Request, res: Response) {
-    const repo = new DinoRepository();
-    let dinos = await repo.findAll();
+    let dinos = await this.dino_repo.findAll();
+    let billets = await this.billet_repo.findAll();
     if (!dinos) dinos = [];
-    res.render("admin/board.ejs", { dinos: dinos });
+    if (!billets) billets = [];
+    res.render("admin/board.ejs", { dinos: dinos, billets: billets });
   }
 
   static async remove_dino(req: Request, res: Response) {
     const id = req.params.id;
     if (!id) return res.status(404);
-    const repo = new DinoRepository();
 
-    repo.get_prop_by_key(parseInt(id), "image_dinosaure_id").then(async (img_id) => {
+    this.dino_repo.get_prop_by_key(parseInt(id), "image_dinosaure_id").then(async (img_id) => {
       if (!img_id) return;
       console.log("[REMOVE IMG ATTEMPT] : for", img_id);
       const remove_img = await CloudinaryClient.getInstance().remove_img(img_id);
       console.log("[REMOVE IMG] : ", remove_img);
     });
 
-    const removed = await repo.remove_item(parseInt(id));
+    const removed = await this.dino_repo.remove_item(parseInt(id));
     if (removed) {
       console.log("[DINOSAURE REMOVED] : ", id);
       return res.status(200).send({ message: "dino removed !" });
+    } else {
+      return res.status(400).send({ message: "an error occured" });
+    }
+  }
+
+  static billet_upload_page(_: Request, res: Response) {
+    res.render("admin/billet_upload.ejs");
+  }
+
+  static async billet_post(req: Request, res: Response) {
+    console.log("[BILLET POST REQUEST");
+
+    try {
+      const img_properties = await this.handle_image(req);
+      const parsed_body = this.billet_schema.parse(req.body);
+
+      if (!img_properties) {
+        console.error("[IMAGE] : incorrect");
+        return res.status(400).send({ message: "Please enter a correct image" });
+      }
+
+      const billet: BilletDTO = {
+        age_minimum: parsed_body.age_minimum,
+        description_billet: parsed_body.description_billet,
+        image_billet: img_properties.url,
+        image_billet_id: img_properties.id,
+        prix_billet: parsed_body.prix_billet,
+        titre_billet: parsed_body.titre_billet,
+      };
+      const billet_add = await this.billet_repo.add_item(billet);
+
+      if (billet_add) {
+        const all_billets = await this.billet_repo.findAll();
+        console.log("[UPDATE BILLET] : ", all_billets);
+        return res.status(200).send({ message: billet });
+      } else {
+        return res.status(500).send({ message: "erreur de la db" });
+      }
+    } catch (err) {
+      console.error("[ERROR] : " + err);
+      if (err instanceof z.ZodError) {
+        return res.status(400).send({
+          message: "Validation échouée",
+          errors: err.issues, // tableau brut
+          // ou si tu veux seulement les messages :
+          messages: err.issues.map((e) => e.message),
+        });
+      }
+      return res.status(400).send({ message: err });
+    }
+  }
+
+  static async remove_billet(req: Request, res: Response) {
+    const id = req.params.id;
+    if (!id) return res.status(404);
+
+    this.billet_repo.get_prop_by_key(parseInt(id), "image_billet_id").then(async (img_id) => {
+      if (!img_id) return;
+      console.log("[REMOVE IMG ATTEMPT] : for", img_id);
+      const remove_img = await CloudinaryClient.getInstance().remove_img(img_id);
+      console.log("[REMOVE IMG] : ", remove_img);
+    });
+
+    const removed = await this.billet_repo.remove_item(parseInt(id));
+    if (removed) {
+      console.log("[BILLET REMOVED] : ", id);
+      return res.status(200).send({ message: "billet removed !" });
     } else {
       return res.status(400).send({ message: "an error occured" });
     }

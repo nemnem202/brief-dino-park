@@ -5,7 +5,7 @@ import { TablesNames } from "../types/tables_names";
 export default abstract class Repository<DTO extends Object, Entity extends object> {
   protected pool: Pool;
   protected abstract tableName: TablesNames;
-  protected abstract fromRow(row: unknown): Entity;
+  protected fromRow = (row: Entity): Entity => row;
 
   constructor() {
     this.pool = Database.getPool();

@@ -38,4 +38,23 @@ routes_admin.get(
   (req, res) => AdminController.remove_dino(req, res)
 );
 
+routes_admin.get(
+  "/billet-upload",
+  (req, res, next) => MiddleWare.check_admin_auth(req, res, next),
+  (req, res) => AdminController.billet_upload_page(req, res)
+);
+
+routes_admin.post(
+  "/billet-upload",
+  (req, res, next) => MiddleWare.check_admin_auth(req, res, next),
+  upload.single("billet_img"),
+  (req, res) => AdminController.billet_post(req, res)
+);
+
+routes_admin.get(
+  "/remove_billet/:id",
+  (req, res, next) => MiddleWare.check_admin_auth(req, res, next),
+  (req, res) => AdminController.remove_billet(req, res)
+);
+
 export default routes_admin;

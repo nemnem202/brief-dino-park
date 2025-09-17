@@ -1,0 +1,14 @@
+<div class="billet-container">
+  <img src="<%- billet.image_billet %>" alt="image-of-<%- billet.titre_billet %>" />
+  <h2><%- billet.titre_billet %></h2>
+  <p><%- billet.description_billet %></p>
+  <p>Prix: <%- billet.prix_billet %></p>
+  <p>Age minimum: <%- billet.age_minimum %> ans</p>
+  <button
+    onclick="
+      fetch('/admin/remove_billet/<%= billet.id %>');
+    "
+  >
+    supprimer X
+  </button>
+</div>
