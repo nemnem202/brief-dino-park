@@ -19,3 +19,55 @@
   <% for (const t of tarifs) { %> <%- include('../../partials/tarif_card.ejs', { tarif:t }) %> <% }
   %>
 </div>
+
+<h1>Statistiques de ventes</h1>
+
+<% 
+  // Initialisation des compteurs
+  const reservationsParJour = {};
+  const reservationsParSemaine = {};
+  const reservationsParMois = {};
+
+  reservations.forEach(r => {
+    const date = new Date(r.date_reservation);
+
+    // clé jour : YYYY-MM-DD
+    const dayKey = date.toISOString().slice(0,10);
+
+    // clé semaine : YYYY-Wxx
+    const firstDayOfYear = new Date(date.getFullYear(),0,1);
+    const weekNumber = Math.ceil((((date - firstDayOfYear)/86400000) + firstDayOfYear.getDay()+1)/7);
+    const weekKey = `${date.getFullYear()}-W${weekNumber}`;
+
+    // clé mois : YYYY-MM
+    const monthKey = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;
+
+    reservationsParJour[dayKey] = (reservationsParJour[dayKey] || 0) + 1;
+    reservationsParSemaine[weekKey] = (reservationsParSemaine[weekKey] || 0) + 1;
+    reservationsParMois[monthKey] = (reservationsParMois[monthKey] || 0) + 1;
+  });
+%>
+
+<h2>Par jour</h2>
+<table border="1" cellpadding="5">
+  <tr><th>Date</th><th>Nombre de réservations</th></tr>
+  <% Object.entries(reservationsParJour).forEach(([date, count]) => { %>
+    <tr><td><%= date %></td><td><%= count %></td></tr>
+  <% }) %>
+</table>
+
+<h2>Par semaine</h2>
+<table border="1" cellpadding="5">
+  <tr><th>Semaine</th><th>Nombre de réservations</th></tr>
+  <% Object.entries(reservationsParSemaine).forEach(([week, count]) => { %>
+    <tr><td><%= week %></td><td><%= count %></td></tr>
+  <% }) %>
+</table>
+
+<h2>Par mois</h2>
+<table border="1" cellpadding="5">
+  <tr><th>Mois</th><th>Nombre de réservations</th></tr>
+  <% Object.entries(reservationsParMois).forEach(([month, count]) => { %>
+    <tr><td><%= month %></td><td><%= count %></td></tr>
+  <% }) %>
+</table>

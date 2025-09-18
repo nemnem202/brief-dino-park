@@ -12,6 +12,8 @@ import { Voir_DinosaureEntity, VoirDinosaureDTO } from "../types/models/voir_din
 import { TarifRepository } from "../repositories/tarif_repository";
 import { TarifDTO, TarifEntity } from "../types/models/tarif";
 import { InclureBilletRepository } from "../repositories/inclure_billet_repository";
+import { ReservationENTITY } from "../types/models/reservation";
+import { ReservationRepository } from "../repositories/reservation_repository";
 
 export default class AdminController {
   private static dino_repo = new DinoRepository();
@@ -19,6 +21,7 @@ export default class AdminController {
   private static voir_dino_repo = new VoirDinoRepository();
   private static tarif_repo = new TarifRepository();
   private static inclure_billet_repo = new InclureBilletRepository();
+  private static reservation__repo = new ReservationRepository();
 
   private static dino_schema = z.object({
     dinosaure_name: z
@@ -153,11 +156,13 @@ export default class AdminController {
     const billets: BilletEntity[] = (await this.billet_repo.findAll()) ?? [];
     const voir_dino: Voir_DinosaureEntity[] = (await this.voir_dino_repo.findAll()) ?? [];
     const tarifs: TarifEntity[] = (await this.tarif_repo.findAll()) ?? [];
+    const reservations: ReservationENTITY[] = (await this.reservation__repo.findAll()) ?? [];
     res.render("admin/board.ejs", {
       dinos: dinos,
       billets: billets,
       voir_dino: voir_dino,
       tarifs: tarifs,
+      reservations: reservations,
       is_admin: true,
     });
   }
