@@ -42,6 +42,30 @@ h2 {
   font-size: 2rem;
 }
 
+form {
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  margin-top: 4rem;
+}
+form input {
+  margin-bottom: 3rem;
+}
+
+input {
+  background-color: transparent;
+  outline: none;
+  border: 2px solid var(--text);
+  color: var(--text);
+  transform: var(--animation-1);
+}
+
+input:hover,
+input:focus {
+  border-color: var(--highlight);
+  color: var(--highlight);
+}
+
 a:not(.visit-card, .logo),
 button:not(.billet-card) {
   all: unset;
@@ -235,13 +259,15 @@ header {
   opacity: 1;
 }
 
-.billets-column > h1 {
+.billets-column > h1,
+#reservation_column > h1 {
   margin-bottom: 1rem;
 }
-.billets-column {
+.billets-column,
+#reservation_column {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 4rem;
 }
 
 .reservation-container {
@@ -293,6 +319,30 @@ header {
 }
 .modal-container .reservation-modal p {
   font-size: 1.5rem;
+}
+
+select {
+  all: unset;
+  border: 2px solid var(--text);
+  transition: var(--animation-1);
+  width: fit-content;
+}
+
+select:hover {
+  color: var(--highlight);
+  border-color: var(--highlight);
+}
+
+.reservation-card {
+  box-shadow: 0px 3px 5px -3px rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 2rem;
+}
+.reservation-card *:not(button) {
+  padding: 0;
+  margin: 0;
 }
 
 /*# sourceMappingURL=global.css.map */

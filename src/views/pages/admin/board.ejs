@@ -1,13 +1,21 @@
-<a href="/admin/dino-upload">New Dino</a>
-<a href="/admin/billet-upload">New Billet</a>
-<a href="/admin/tarif-upload">New Tarif</a>
+<%- include('../../partials/head.ejs') %>
+
+<div style="display: flex; justify-content: flex-end; width: 100%">
+  <a href="/admin/dino-upload">Nouveau Dino</a>
+  <a href="/admin/billet-upload">Nouveau Billet</a>
+  <a href="/admin/tarif-upload">Nouveau Tarif</a>
+</div>
 <h1>Dinosaures:</h1>
-<% for (const d of dinos) { %> <%- include('../../partials/dino_card.ejs', { dino: d }) %> <% } %>
-
+<div style="display: flex; flex-wrap: wrap; gap: 3rem; padding: 3rem">
+  <% for (const d of dinos) { %> <%- include('../../partials/dino_card.ejs', { dino: d }) %> <% } %>
+</div>
 <h1>Billets :</h1>
-<!-- prettier-ignore -->
-<% for (const b of billets) { %> <%- include('../../partials/billet_card.ejs', { billet: b, dinos:dinos, voir_dino:voir_dino }) %> <% } %>
-
+<div style="display: flex; flex-wrap: wrap; gap: 3rem; padding: 3rem">
+  <!-- prettier-ignore -->
+  <% for (const b of billets) { %> <%- include('../../partials/billet_card.ejs', { billet: b, dinos:dinos, voir_dino:voir_dino }) %> <% } %>
+</div>
 <h1>Tarifs disponlibes</h1>
-
-<% for (const t of tarifs) { %> <%- include('../../partials/tarif_card.ejs', { tarif:t }) %> <% } %>
+<div style="display: flex; flex-wrap: wrap; gap: 3rem; padding: 3rem">
+  <% for (const t of tarifs) { %> <%- include('../../partials/tarif_card.ejs', { tarif:t }) %> <% }
+  %>
+</div>

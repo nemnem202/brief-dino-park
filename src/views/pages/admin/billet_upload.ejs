@@ -1,3 +1,5 @@
+<%- include('../../partials/head.ejs') %>
+
 <form id="billet-form">
   <label for="titre-billet">titre du billet</label>
   <input type="text" id="titre-billet" name="titre_billet" value="Jurrassique" />
@@ -15,12 +17,15 @@
   <label for="image">image du billet</label>
   <input type="file" accept=".png, .jpg, .jpeg" id="billet-img" name="billet_img" />
   <h3>Dinosaures:</h3>
-  <% for(let i = 0; i < dinos.length; i++) { %>
-  <label>
-    <input type="checkbox" class="dino-checkbox" value="<%= dinos[i].id %>" />
-    <%= dinos[i].nom_dinosaure %> </label
-  ><br />
-  <% } %>
+  <div style="display: flex">
+    <% for(let i = 0; i < dinos.length; i++) { %>
+    <label>
+      <input type="checkbox" class="dino-checkbox" value="<%= dinos[i].id %>" />
+      <%= dinos[i].nom_dinosaure %> </label
+    ><br />
+    <% } %>
+  </div>
+
   <button type="submit">Envoyer</button>
 </form>
 
