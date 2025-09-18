@@ -144,10 +144,23 @@ function add_total(container) {
         totalBtn.addEventListener("click", () => post_achat());
     }
 }
-function post_achat() {
+async function post_achat() {
     if (achats.length <= 0)
         return;
-    fetch("/user/payment", {
-        method: "POST",
+    const achats_to_send = achats.map((a) => {
+        return { billet_id: a.billet.id, tarif_id: a.tarif_id };
     });
+    const response = await fetch("/user/payment", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ achats: achats_to_send }),
+    });
+    if (response.redirected) {
+        window.location.href = response.url;
+        return;
+    }
+    const res = await response.json();
+    console.log(res);
 }
