@@ -11,12 +11,14 @@ import { VoirDinoRepository } from "../repositories/voir_dino_repository";
 import { Voir_DinosaureEntity, VoirDinosaureDTO } from "../types/models/voir_dinosaure";
 import { TarifRepository } from "../repositories/tarif_repository";
 import { TarifDTO, TarifEntity } from "../types/models/tarif";
+import { InclureBilletRepository } from "../repositories/inclure_billet_repository";
 
 export default class AdminController {
   private static dino_repo = new DinoRepository();
   private static billet_repo = new BilletRepository();
   private static voir_dino_repo = new VoirDinoRepository();
   private static tarif_repo = new TarifRepository();
+  private static inclure_billet_repo = new InclureBilletRepository();
 
   private static dino_schema = z.object({
     dinosaure_name: z
@@ -266,6 +268,16 @@ export default class AdminController {
       for (const l of links.filter((l) => String(l.code_billet) === String(id))) {
         console.log("[TRYING TO REMOVE]", id, "in", l);
         await this.voir_dino_repo.remove_item(Number(l.id));
+      }
+    }
+
+    const inclure_billet_links = await this.inclure_billet_repo.findAll();
+
+    if (inclure_billet_links) {
+      console.log("[INCLURE BILLETS LINKS FOUND] :", inclure_billet_links);
+      for (const il of inclure_billet_links.filter((l) => String(l.code_billet) === String(id))) {
+        console.log("[TRYING TO REMOVE]", id, "in", il);
+        await this.inclure_billet_repo.remove_item(Number(il.id));
       }
     }
 

@@ -1,0 +1,24 @@
+<div class="user-reservation-card">
+  <h2>Date: <%= reservation.date %></h2>
+
+  <% reservation.billets.forEach(function(billet) { %>
+  <div class="billet-card">
+    <div class="img-container">
+      <img src="<%- billet.image_billet %>" alt="image-of-<%- billet.titre_billet %>" />
+    </div>
+    <div class="left">
+      <div>
+        <h2><%- billet.titre_billet %></h2>
+        <p><%- billet.description_billet %></p>
+      </div>
+      <% if (parseInt(billet.age_minimum) >0) { %>
+      <p>Age minimum: <%- billet.age_minimum %> ans</p>
+      <%} else {%>
+      <p>Tout ages</p>
+      <%}%>
+
+      <p>Prix: <%= parseInt(billet.prix_billet) %></p>
+    </div>
+  </div>
+  <% }) %>
+</div>

@@ -1,0 +1,7 @@
+<%- include('../partials/head.ejs') %> <%- include('../partials/header.ejs') %>
+
+<h1>Vos réservations:</h1>
+<div class="user-reservations">
+  <% for (const r of reservations) { %> <%- include('../partials/reservation_card.ejs', {
+  reservation: r }) %> <% } %>
+</div>

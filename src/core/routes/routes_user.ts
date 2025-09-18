@@ -12,4 +12,10 @@ routes_user.post(
   }
 );
 
+routes_user.get(
+  "/account",
+  (req, res, next) => MiddleWare.check_user_auth(req, res, next),
+  (req, res) => UserController.show_account(req, res)
+);
+
 export default routes_user;

@@ -101,4 +101,78 @@ export default class UserController {
       return res.send({ message: "internal error" }).status(500);
     }
   }
+
+  static async show_account(req: Request, res: Response) {
+    try {
+      const id = req.user_id;
+
+      if (!id) {
+        console.log("[ACCOUNT ID NULL]");
+        return res.status(500).redirect("/");
+      }
+
+      const reservation = await this.reservation_repo.findAll();
+
+      if (!reservation) {
+        console.log("[FAILED TO GET RESERVATION]");
+        return res.status(500).redirect("/");
+      }
+
+      const user_reservations = reservation.filter(
+        (r) => String(r.code_utilisateur) === String(id)
+      );
+
+      const inclure_billet = await this.inclure_billet_repo.findAll();
+
+      if (!inclure_billet) {
+        console.log("[FAILED TO GET BILLET]");
+        return res.status(500).redirect("/");
+      }
+
+      const billets = await this.billet_repo.findAll();
+
+      if (!billets) {
+        console.log("[FAILED TO GET BILLETS]");
+        return res.status(500).redirect("/");
+      }
+
+      const all_user_reservation: { date: Date; billets: BilletEntity[] }[] = [];
+
+      for (const us of user_reservations) {
+        const billets_of_reservation: BilletEntity[] = [];
+
+        const related_billets_included = inclure_billet.filter(
+          (ib) => String(ib.code_reservation) === String(us.id)
+        );
+
+        for (const rb of related_billets_included) {
+          let billet = billets.find((b) => String(b.id) === String(rb.code_billet));
+          if (!billet) {
+            billet = {
+              age_minimum: 0,
+              description_billet: "X",
+              id: -1,
+              image_billet: "...",
+              image_billet_id: "...",
+              prix_billet: 0,
+              titre_billet: "ERROR BILLET PLACEHOLDER",
+            };
+          }
+          billets_of_reservation.push(billet);
+        }
+
+        all_user_reservation.push({
+          date: us.date_reservation,
+          billets: billets_of_reservation,
+        });
+
+        console.log(billets);
+      }
+
+      return res.render("compte.ejs", { reservations: all_user_reservation });
+    } catch (err) {
+      console.log("[ACCOUNT ERROR] : ", err);
+      return res.redirect("/");
+    }
+  }
 }
