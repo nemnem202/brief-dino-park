@@ -1,0 +1,11 @@
+<a class="visit-card" href="/reservations">
+  <img src="<%- billet.image_billet %>" alt="image-of-<%- billet.titre_billet %>" />
+  <h2><%- billet.titre_billet %></h2>
+  <p><%- billet.description_billet %></p>
+
+  <% if (billet.age_minimum >0) { %>
+  <p>Age minimum: <%- billet.age_minimum %> ans</p>
+  <%} else {%>
+  <p>Tout ages</p>
+  <%}%>
+</a>

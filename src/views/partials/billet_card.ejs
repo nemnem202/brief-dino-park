@@ -1,18 +1,11 @@
-<div class="billet-container">
-  <img src="<%- billet.image_billet %>" alt="image-of-<%- billet.titre_billet %>" />
-  <h2><%- billet.titre_billet %></h2>
-  <p><%- billet.description_billet %></p>
-  <p>Prix: <%- billet.prix_billet %></p>
-  <p>Age minimum: <%- billet.age_minimum %> ans</p>
-  <p><%- billet.id %></p>
-
-  <% dinos.forEach(dino => { %> <% if (voir_dino.some(v => v.code_dinosaure ===dino.id)) { %>
-  <div>voir dino: <%= dino.nom_dinosaure %></div>
-  <% } %> <% }) %>
-  <!-- prettier-ignore -->
+<div class="billet-card">
+  <div class="img-container">
+    <img src="<%- billet.image_billet %>" alt="image-of-<%- billet.titre_billet %>" />
+  </div>
 
   <% if (is_admin) { %>
   <button
+    class="action"
     onclick="
       fetch('/admin/remove_billet/<%= billet.id %>');
       window.location.reload()
@@ -21,6 +14,26 @@
     supprimer X
   </button>
   <% } else { %>
-  <button id="ajouter_billet">ajouter</button>
+  <button id="ajouter_billet<%= billet.id %>" class="action">ajouter</button>
   <% } %>
+  <div class="left">
+    <div>
+      <h2><%- billet.titre_billet %></h2>
+      <p><%- billet.description_billet %></p>
+    </div>
+
+    <div>
+      <h2>Les dinosaures à voir</h2>
+      <div>
+        <% dinos.forEach(dino => { %> <% if (voir_dino.some(v => v.code_dinosaure ===dino.id)) { %>
+        <span><%= dino.nom_dinosaure %></span>
+        <% } %> <% }) %>
+      </div>
+    </div>
+    <% if (billet.age_minimum >0) { %>
+    <p>Age minimum: <%- billet.age_minimum %> ans</p>
+    <%} else {%>
+    <p>Tout ages</p>
+    <%}%>
+  </div>
 </div>

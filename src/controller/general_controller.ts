@@ -5,11 +5,14 @@ import { DinosaureEntity } from "../types/models/dinosaure";
 import { BilletEntity } from "../types/models/billet";
 import { Voir_DinosaureEntity } from "../types/models/voir_dinosaure";
 import { VoirDinoRepository } from "../repositories/voir_dino_repository";
+import { TarifRepository } from "../repositories/tarif_repository";
+import { TarifEntity } from "../types/models/tarif";
 
 export default class GeneralController {
   private static billet_repo = new BilletRepository();
   private static dino_repo = new DinoRepository();
-  public static voir_dino_repo = new VoirDinoRepository();
+  private static voir_dino_repo = new VoirDinoRepository();
+  private static tarifs_repo = new TarifRepository();
 
   static async get_home_page(req: Request, res: Response) {
     if (req.user_id) {
@@ -22,7 +25,12 @@ export default class GeneralController {
     const billets: BilletEntity[] = (await this.billet_repo.findAll()) ?? [];
     const voir_dino: Voir_DinosaureEntity[] = (await this.voir_dino_repo.findAll()) ?? [];
 
-    res.render("home.ejs", { dinos: dinos, billets: billets, voir_dino: voir_dino });
+    res.render("home.ejs", {
+      dinos: dinos,
+      billets: billets,
+      voir_dino: voir_dino,
+      is_admin: false,
+    });
   }
 
   static async get_reservation_page(req: Request, res: Response) {
@@ -35,5 +43,10 @@ export default class GeneralController {
       voir_dino: voir_dino,
       is_admin: false,
     });
+  }
+
+  static async get_available_tarifs(req: Request, res: Response) {
+    const tarifs: TarifEntity[] = (await this.tarifs_repo.findAll()) ?? [];
+    res.send({ tarifs });
   }
 }

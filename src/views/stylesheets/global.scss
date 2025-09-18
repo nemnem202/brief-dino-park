@@ -1,0 +1,316 @@
+:root {
+  --primary: #b9ffb7;
+  --secondary: #98d9c2;
+  --highlight: #f19a3e;
+  --background: #403233;
+  --text: white;
+
+  font-size: 10px;
+
+  --spacing-s: 1rem;
+
+  --spacing-xs: 0.5rem;
+
+  --animation-1: all 0.3s ease;
+
+  --main-font: "Roboto", sans-serif;
+  --logo-font: "Alumni Sans Pinstripe", sans-serif;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text);
+  font-size: 2rem;
+  font-family: var(--main-font);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding: 0;
+  margin: 0;
+}
+
+body::-webkit-scrollbar {
+  width: 0px;
+}
+
+body.modal-open {
+  // height: 100vh;
+  overflow: hidden;
+}
+
+h1 {
+  font-size: 3rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+a:not(.visit-card, .logo),
+button:not(.billet-card) {
+  all: unset;
+  padding: var(--spacing-xs) var(--spacing-s);
+  cursor: pointer;
+  transition: var(--animation-1);
+  border-radius: 0.5rem;
+  width: fit-content;
+}
+
+a:hover:not(.logo, .visit-card),
+button:hover:not(.billet-card) {
+  background-color: #f19a3e;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4rem;
+  width: 100%;
+}
+
+.logo {
+  all: unset;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  font-family: var(--logo-font);
+  font-size: 3rem;
+  font-weight: bold;
+  gap: 1rem;
+  cursor: pointer;
+  transition: var(--animation-1);
+  svg {
+    transition: var(--animation-1);
+    fill: var(--text);
+  }
+}
+
+.logo:hover {
+  color: var(--highlight);
+  svg {
+    fill: var(--highlight);
+  }
+}
+
+.banner {
+  display: flex;
+  justify-content: center;
+  gap: 150px;
+  align-items: center;
+  margin-bottom: 4rem;
+  h1 {
+    font-size: 3rem;
+    max-width: 300px;
+  }
+
+  img {
+    width: 300px;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+  }
+}
+
+.visits,
+.dinosaures {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rem;
+  margin-bottom: 4rem;
+
+  > div {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    max-width: 90vw;
+    align-items: center;
+    margin: auto;
+  }
+}
+
+.visit-card,
+.dino-card {
+  all: unset;
+  cursor: pointer;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  transition: var(--animation-1);
+  gap: 1rem;
+  box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.5);
+  img {
+    aspect-ratio: 3/2;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+
+  *:not(img) {
+    padding: 1rem;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  :last-child {
+    opacity: 0.5;
+    padding-bottom: 1rem;
+  }
+
+  h2 {
+    font-size: 2rem;
+    color: var(--highlight);
+    white-space: nowrap; /* empêche le retour à la ligne */
+    overflow: hidden; /* masque ce qui dépasse */
+    text-overflow: ellipsis;
+  }
+
+  p {
+    font-size: 1.5rem;
+  }
+}
+
+.btn-reservation {
+  margin-top: 6rem !important;
+  margin-bottom: 6rem !important;
+  font-weight: bold !important;
+}
+
+.visit-card:hover,
+.dino-card:hover {
+  box-shadow: 0px 10px 15px -3px rgba(150, 150, 150, 0);
+}
+
+.billet-card {
+  all: unset;
+  display: flex;
+  height: 200px;
+  cursor: pointer;
+
+  box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.5);
+
+  h2 {
+    color: var(--highlight);
+  }
+
+  span,
+  p {
+    font-size: 1.5rem;
+  }
+
+  .img-container {
+    overflow: hidden;
+    flex: 1.5;
+    display: flex;
+    justify-content: center; /* centre horizontalement */
+    align-items: center;
+    img {
+      object-fit: cover;
+      height: 100%;
+      aspect-ratio: 3/2;
+    }
+  }
+
+  position: relative;
+
+  .action {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    opacity: 0;
+  }
+  .left {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 2rem;
+    flex: 2;
+    * {
+      padding: 0;
+      margin: 0;
+    }
+  }
+}
+
+.billet-card:hover {
+  // box-shadow: 0px 10px 15px -3px rgba(150, 150, 150, 0);
+  .action {
+    opacity: 1;
+  }
+}
+
+.billets-column {
+  > h1 {
+    margin-bottom: 1rem;
+  }
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.reservation-container {
+  display: flex;
+  width: 100%;
+  gap: 3rem;
+  padding: 0 5rem;
+  box-sizing: border-box;
+
+  > div {
+    flex: 1;
+  }
+}
+
+.modal-container {
+  position: fixed; // toujours par rapport à l’écran
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+
+  display: flex;
+  align-items: center; // vertical
+  justify-content: center; // horizontal
+  .reservation-modal {
+    width: 300px;
+    background-color: var(--background);
+
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 1rem;
+    gap: 1.5rem;
+    img {
+      width: 100%;
+      aspect-ratio: 3/2;
+      object-fit: cover;
+    }
+
+    *:not(button) {
+      padding: 0;
+      margin: 0;
+
+      font-size: 2rem;
+    }
+
+    *:not(img) {
+      margin: 0 1rem;
+    }
+
+    h2 {
+      font-size: 3rem;
+      color: var(--highlight);
+    }
+
+    p {
+      font-size: 1.5rem;
+    }
+  }
+}

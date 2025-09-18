@@ -1,5 +1,19 @@
-<h1>Réservez</h1>
+<%- include('../partials/head.ejs') %> <%- include('../partials/header.ejs') %>
+<section class="reservation-container">
+  <div class="billets-column">
+    <h1>Billets :</h1>
+    <% for (const b of billets) { %> <%- include('../partials/billet_card.ejs', { billet: b,
+    voir_dino: voir_dino, dinos:dinos, is_admin: is_admin }) %> <% } %>
+  </div>
 
-<h1>Billets :</h1>
+  <div id="reservation-column">
+    <h1>Votre réservation :</h1>
+  </div>
+</section>
 <!-- prettier-ignore -->
-<% for (const b of billets) { %> <%- include('../partials/billet_card.ejs', { billet: b, voir_dino: voir_dino, dinos:dinos, is_admin: is_admin }) %> <% } %>
+
+<script type="application/json" id="billet-importer">
+  <%- JSON.stringify(billets)  %>
+</script>
+
+<script src="/scripts/reservation.js"></script>

@@ -1,8 +1,25 @@
-<%- include('../partials/header.ejs') %>
+<%- include('../partials/head.ejs') %> <%- include('../partials/header.ejs') %>
 
-<h1>Dinosaures:</h1>
-<% for (const d of dinos) { %> <%- include('../partials/dino_card.ejs', { dino: d }) %> <% } %>
+<div class="banner">
+  <h1>L'endroit où les rêves deviennent réalité</h1>
+  <img src="/assets/banner-img.jpg" alt="img-of-dino-park" />
+</div>
 
-<h1>Billets :</h1>
-<!-- prettier-ignore -->
-<% for (const b of billets) { %> <%- include('../partials/billet_card.ejs', { billet: b, dinos:dinos, voir_dino:voir_dino }) %> <% } %>
+<div class="visits">
+  <h2>Des visites guidées et ludiques !</h2>
+
+  <div>
+    <% for (const b of billets) { %> <%- include('../partials/visit.ejs', { billet: b, dinos:dinos,
+    voir_dino:voir_dino }) %> <% } %>
+  </div>
+</div>
+
+<a href="/reservations" class="btn-reservation">Réservez dès maintenant</a>
+
+<div class="dinosaures">
+  <h2>Nos dinosaures</h2>
+
+  <div>
+    <% for (const d of dinos) { %> <%- include('../partials/dino_card.ejs', { dino:d }) %> <% } %>
+  </div>
+</div>

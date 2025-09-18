@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"tsx watch src/core/app.ts\" \"npm run watch:frontend\"",
+    "dev": "concurrently \"tsx watch src/core/app.ts\" \"npm run watch:frontend\" \"npm run scss:watch\"",
     "build:frontend": "tsc -p tsconfig.frontend.json",
-    "watch:frontend": "tsc -p tsconfig.frontend.json --watch"
+    "watch:frontend": "tsc -p tsconfig.frontend.json --watch",
+    "scss:watch": "sass --watch src/views/stylesheets:public/stylesheets"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +23,7 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "pg": "^8.16.3",
+    "sass": "^1.92.1",
     "streamifier": "^0.1.1",
     "zod": "^4.1.8"
   },

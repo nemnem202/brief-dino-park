@@ -12,4 +12,8 @@ general_routes.get(
 
 general_routes.get("/reservations", (req, res) => GeneralController.get_reservation_page(req, res));
 
+general_routes.get("/available-tarifs", (req, res) =>
+  GeneralController.get_available_tarifs(req, res)
+);
+
 export default general_routes;
