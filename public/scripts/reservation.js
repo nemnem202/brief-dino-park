@@ -141,5 +141,13 @@ function add_total(container) {
         const totalBtn = document.createElement("button");
         totalBtn.textContent = `Payer : ${total} €`;
         container.appendChild(totalBtn);
+        totalBtn.addEventListener("click", () => post_achat());
     }
+}
+function post_achat() {
+    if (achats.length <= 0)
+        return;
+    fetch("/user/payment", {
+        method: "POST",
+    });
 }

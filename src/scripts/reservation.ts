@@ -209,5 +209,14 @@ function add_total(container: HTMLDivElement) {
     totalBtn.textContent = `Payer : ${total} €`;
 
     container.appendChild(totalBtn);
+
+    totalBtn.addEventListener("click", () => post_achat());
   }
+}
+
+function post_achat() {
+  if (achats.length <= 0) return;
+  fetch("/user/payment", {
+    method: "POST",
+  });
 }

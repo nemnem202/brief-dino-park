@@ -33,18 +33,15 @@ export class MiddleWare {
     try {
       const token = req.cookies.user_token;
       const id = CookieGen.check_user_id_from_token(token);
+      console.log("[ID] : ", id, token);
       if (id) {
         req.user_id = id;
         next();
       } else {
-        next();
+        res.redirect("/connexion/sign-up");
       }
     } catch (err) {
-      next();
+      res.redirect("connextion/sign-up");
     }
   }
-
-  //   static check_file_format(file: File, mime_types: string[]) {
-  //     if (mime_types.includes(file.))
-  //   }
 }

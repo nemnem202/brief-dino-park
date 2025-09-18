@@ -11,61 +11,112 @@ export default class ConnexionController {
     email: z.email(),
     password: z.string(),
   });
-  static async sign_in(req: Request, res: Response) {
+  static async sign_up(req: Request, res: Response) {
     try {
       const parsed_body = this.user_schema.parse(req.body);
 
-      parsed_body.password = await argon2.hash(parsed_body.password);
+      console.log("[SIGN_UP] Tentative d’inscription pour :", parsed_body.email);
 
-      const user: Compte_utilisateurDTO = {
+      // Hash du mot de passe
+      const hashedPassword = await argon2.hash(parsed_body.password);
+
+      const newUser: Compte_utilisateurDTO = {
         email: parsed_body.email,
-        mot_de_passe: parsed_body.password,
+        mot_de_passe: hashedPassword,
         est_administrateur: false,
       };
 
-      const user_entity = await this.user_repo.add_item(user);
+      const user_entity = await this.user_repo.add_item(newUser);
 
-      if (user_entity && user_entity.code_utilisateur) {
-        const token = CookieGen.generate_user_token(user_entity.code_utilisateur);
-        if (!token) return;
-        res
-          .cookie("user_token", token, {
-            httpOnly: true,
-            secure: false,
-            maxAge: 1000 * 60 * 60,
-          })
-          .send({ message: user_entity.code_utilisateur, redirect: "/" });
-      } else {
-        res.status(500).send({ message: "an error occured" });
+      if (!user_entity || !user_entity.id) {
+        console.error("[SIGN_UP] Erreur lors de la création en DB");
+        return res.status(500).send({ message: "Impossible de créer le compte" });
       }
+
+      console.log("[SIGN_UP] Utilisateur créé avec ID :", user_entity.id);
+
+      const token = CookieGen.generate_user_token(user_entity.id);
+
+      if (!token) {
+        console.error("[SIGN_UP] Impossible de générer un token");
+        return res.status(500).send({ message: "Erreur serveur" });
+      }
+
+      res
+        .cookie("user_token", token, {
+          httpOnly: true,
+          secure: false, // ⚠️ mets true si tu passes en HTTPS
+          maxAge: 1000 * 60 * 60,
+        })
+        .status(201)
+        .send({ message: "Compte créé", redirect: "/" });
     } catch (err) {
-      console.error("[ERROR] : " + err);
+      console.error("[SIGN_UP] Erreur :", err);
+
       if (err instanceof z.ZodError) {
         return res.status(400).send({
           message: "Validation échouée",
           errors: err.issues,
-          messages: err.issues.map((e) => e.message),
         });
       }
-      return res.status(400).send({ message: err });
+
+      return res.status(500).send({ message: "Erreur serveur" });
     }
   }
 
-  static async sign_up(req: Request, res: Response) {
+  static async sign_in(req: Request, res: Response) {
     try {
       const parsed_body = this.user_schema.parse(req.body);
-      const users = await this.user_repo.findAll();
-      if (!users) return res.status(500);
-      const target = users.find((u) => u.email === parsed_body.email);
-      if (!target) return res.status(404);
-      const auth = await argon2.verify(parsed_body.password, target.mot_de_passe);
 
-      if (auth) {
-        console.log("[USER IS AUTHENTIFIED]");
-      } else {
-        console.log("[USER FAILED TO AUTH]");
-        return res.status(404);
+      console.log("[SIGN_IN] Tentative de connexion :", parsed_body.email);
+
+      const users = await this.user_repo.findAll();
+      if (!users) {
+        console.error("[SIGN_IN] Impossible de récupérer les utilisateurs");
+        return res.status(500).send({ message: "Erreur serveur" });
       }
-    } catch (err) {}
+
+      const target = users.find((u) => u.email === parsed_body.email);
+
+      if (!target) {
+        console.warn("[SIGN_IN] Email non trouvé :", parsed_body.email);
+        return res.status(404).send({ message: "Utilisateur non trouvé" });
+      }
+
+      const auth = await argon2.verify(target.mot_de_passe, parsed_body.password);
+
+      if (!auth) {
+        console.warn("[SIGN_IN] Mot de passe invalide pour :", parsed_body.email);
+        return res.status(401).send({ message: "Identifiants incorrects" });
+      }
+
+      console.log("[SIGN_IN] Authentification réussie pour :", target.id);
+
+      const token = CookieGen.generate_user_token(target.id);
+
+      if (!token) {
+        console.error("[SIGN_IN] Impossible de générer un token");
+        return res.status(500).send({ message: "Erreur serveur" });
+      }
+
+      res
+        .cookie("user_token", token, {
+          httpOnly: true,
+          secure: false, // ⚠️ mets true si HTTPS
+          maxAge: 1000 * 60 * 60,
+        })
+        .send({ message: "Connexion réussie", redirect: "/" });
+    } catch (err) {
+      console.error("[SIGN_IN] Erreur :", err);
+
+      if (err instanceof z.ZodError) {
+        return res.status(400).send({
+          message: "Validation échouée",
+          errors: err.issues,
+        });
+      }
+
+      return res.status(500).send({ message: "Erreur serveur" });
+    }
   }
 }

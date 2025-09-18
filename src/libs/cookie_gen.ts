@@ -21,16 +21,25 @@ export default class CookieGen {
   static generate_user_token(userId: string): string | null {
     const user_key = process.env.USER_SECRET;
     if (!user_key) return null;
+    if (!userId) {
+      console.log("[NO USER ID]");
+      return null;
+    } else {
+      console.log("[USER ID] :", userId);
+    }
     return jwt.sign({ userId }, user_key, { expiresIn: "1h" });
   }
 
   static check_user_id_from_token(token: string): string | null {
     const user_key = process.env.USER_SECRET;
+    console.log("[USER KEY] : ", user_key);
     if (!user_key) return null;
     try {
       const decoded = jwt.verify(token, user_key) as { userId: string };
+      console.log("[DECODED USER ID] : ", decoded.userId);
       return decoded.userId;
     } catch (err) {
+      console.log("[AN ERROR OCCURED]", err);
       return null;
     }
   }
