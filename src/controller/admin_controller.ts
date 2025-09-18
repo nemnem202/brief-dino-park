@@ -172,6 +172,16 @@ export default class AdminController {
       console.log("[REMOVE IMG] : ", remove_img);
     });
 
+    const links = await this.voir_dino_repo.findAll();
+
+    if (links) {
+      console.log("[LINKS FOUND] :", links);
+      for (const l of links.filter((l) => String(l.code_dinosaure) === String(id))) {
+        console.log("[TRYING TO REMOVE]", id, "in", l);
+        await this.voir_dino_repo.remove_item(Number(l.id));
+      }
+    }
+
     const removed = await this.dino_repo.remove_item(parseInt(id));
     if (removed) {
       console.log("[DINOSAURE REMOVED] : ", id);
@@ -248,6 +258,16 @@ export default class AdminController {
       const remove_img = await CloudinaryClient.getInstance().remove_img(img_id);
       console.log("[REMOVE IMG] : ", remove_img);
     });
+
+    const links = await this.voir_dino_repo.findAll();
+
+    if (links) {
+      console.log("[LINKS FOUND] :", links);
+      for (const l of links.filter((l) => String(l.code_billet) === String(id))) {
+        console.log("[TRYING TO REMOVE]", id, "in", l);
+        await this.voir_dino_repo.remove_item(Number(l.id));
+      }
+    }
 
     const removed = await this.billet_repo.remove_item(parseInt(id));
 
