@@ -9,7 +9,9 @@
   <% dinos.forEach(dino => { %> <% if (voir_dino.some(v => v.code_dinosaure ===dino.id)) { %>
   <div>voir dino: <%= dino.nom_dinosaure %></div>
   <% } %> <% }) %>
+  <!-- prettier-ignore -->
 
+  <% if (is_admin) { %>
   <button
     onclick="
       fetch('/admin/remove_billet/<%= billet.id %>');
@@ -18,4 +20,7 @@
   >
     supprimer X
   </button>
+  <% } else { %>
+  <button id="ajouter_billet">ajouter</button>
+  <% } %>
 </div>

@@ -2,4 +2,4 @@
 
 <h1>Billets :</h1>
 <!-- prettier-ignore -->
-<% for (const b of billets) { %> <%- include('../partials/billet_card.ejs', { billet: b }) %> <% } %>
+<% for (const b of billets) { %> <%- include('../partials/billet_card.ejs', { billet: b, voir_dino: voir_dino, dinos:dinos, is_admin: is_admin }) %> <% } %>

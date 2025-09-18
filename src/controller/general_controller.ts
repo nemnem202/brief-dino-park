@@ -26,7 +26,14 @@ export default class GeneralController {
   }
 
   static async get_reservation_page(req: Request, res: Response) {
+    const dinos: DinosaureEntity[] = (await this.dino_repo.findAll()) ?? [];
     const billets: BilletEntity[] = (await this.billet_repo.findAll()) ?? [];
-    res.render("reservation_page.ejs", { billets: billets });
+    const voir_dino: Voir_DinosaureEntity[] = (await this.voir_dino_repo.findAll()) ?? [];
+    res.render("reservation_page.ejs", {
+      dinos: dinos,
+      billets: billets,
+      voir_dino: voir_dino,
+      is_admin: false,
+    });
   }
 }

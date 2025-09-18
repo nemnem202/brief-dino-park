@@ -156,6 +156,7 @@ export default class AdminController {
       billets: billets,
       voir_dino: voir_dino,
       tarifs: tarifs,
+      is_admin: true,
     });
   }
 
