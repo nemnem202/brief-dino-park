@@ -1,36 +1,45 @@
-# Étape 1 : construire le projet
-FROM node:22 AS builder
+# syntax = docker/dockerfile:1
 
+# Adjust NODE_VERSION as desired
+ARG NODE_VERSION=20.18.0
+FROM node:${NODE_VERSION}-slim AS base
+
+LABEL fly_launch_runtime="Node.js"
+
+# Node.js app lives here
 WORKDIR /app
 
-# Copier package.json + package-lock.json pour installer les dépendances
-COPY package*.json ./
+# Set production environment
+ENV NODE_ENV="production"
 
-RUN npm install
 
-# Copier tout le projet
+# Throw-away build stage to reduce size of final image
+FROM base AS build
+
+# Install packages needed to build node modules
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y build-essential node-gyp pkg-config python-is-python3
+
+# Install node modules
+COPY package-lock.json package.json ./
+RUN npm ci --include=dev
+
+# Copy application code
 COPY . .
 
-# Compiler le backend et le frontend + copier les vues/assets
-# Assure-toi que npm run build génère bien tout dans la racine du dossier public
+# Build application
 RUN npm run build
 
-# Étape 2 : conteneur final
-FROM node:22
+# Remove development dependencies
+RUN npm prune --omit=dev
 
-WORKDIR /app
 
-# Copier uniquement ce dont on a besoin depuis l'étape builder
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package*.json ./
-# AJOUT : Copier le dossier public entier
-COPY --from=builder /app/public ./public 
+# Final stage for app image
+FROM base
 
-RUN npm install --production
+# Copy built application
+COPY --from=build /app /app
 
-ENV NODE_ENV=production
-ENV PORT=3000
-
+# Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-
-CMD ["node", "dist/core/app.js"]
+CMD [ "npm", "run", "start" ]
