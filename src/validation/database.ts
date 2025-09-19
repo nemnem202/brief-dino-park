@@ -10,11 +10,11 @@ export default class Database {
     if (!this.pool) {
       dotenv.config();
       const pool_config = {
-        user: process.env.PGUSER,
-        password: process.env.PGPASSWORD,
-        host: process.env.PGHOST,
-        port: process.env.PGPORT ? parseInt(process.env.PGPORT, 10) : undefined,
-        database: process.env.PGDATABASE,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : undefined,
+        database: process.env.DB_DATABASE,
       };
       console.log("[POOL CONFIG] : ");
       console.table(pool_config);
