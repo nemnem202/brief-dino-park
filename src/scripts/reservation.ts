@@ -17,6 +17,7 @@ interface BilletEntity {
 interface Achat {
   billet: BilletEntity;
   tarif_id: string | number | null;
+  date_visite: Date;
 }
 
 let tarifs: TarifEntity[] = [];
@@ -124,20 +125,28 @@ function setup_modal(
     modal.appendChild(noTarifs);
   }
 
+  const label_date = document.createElement("div");
+  label.textContent = "Date de visite";
+  modal.appendChild(label_date);
+
+  const date = document.createElement("input");
+  date.type = "date";
+  modal.appendChild(date);
+
   const button = document.createElement("button");
   button.textContent = "Ajouter";
   modal.appendChild(button);
 
   button.addEventListener("click", () =>
-    add_achat(modal_container, tarifs, parseInt(select.value), b)
+    add_achat(modal_container, parseInt(select.value), b, new Date(date.value))
   );
 }
 
 function add_achat(
   modal_container: HTMLDivElement,
-  tarifs: TarifEntity[],
   tarif_id: number,
-  billet: BilletEntity
+  billet: BilletEntity,
+  date_visite: Date
 ) {
   const reservations_container = document.getElementById("reservation_column") as HTMLDivElement;
   if (!reservations_container) {
@@ -147,6 +156,7 @@ function add_achat(
   achats.push({
     billet: billet,
     tarif_id: tarif_id,
+    date_visite,
   });
 
   document.body.classList.remove("modal-open");
@@ -217,7 +227,7 @@ function add_total(container: HTMLDivElement) {
 async function post_achat() {
   if (achats.length <= 0) return;
   const achats_to_send = achats.map((a) => {
-    return { billet_id: a.billet.id, tarif_id: a.tarif_id };
+    return { billet_id: a.billet.id, tarif_id: a.tarif_id, date_visite: a.date_visite };
   });
   const response = await fetch("/user/payment", {
     method: "POST",

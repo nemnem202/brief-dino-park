@@ -81,12 +81,18 @@ function setup_modal(modal, modal_container, b, tarifs) {
         noTarifs.textContent = "Pas de tarifs disponibles";
         modal.appendChild(noTarifs);
     }
+    const label_date = document.createElement("div");
+    label.textContent = "Date de visite";
+    modal.appendChild(label_date);
+    const date = document.createElement("input");
+    date.type = "date";
+    modal.appendChild(date);
     const button = document.createElement("button");
     button.textContent = "Ajouter";
     modal.appendChild(button);
-    button.addEventListener("click", () => add_achat(modal_container, tarifs, parseInt(select.value), b));
+    button.addEventListener("click", () => add_achat(modal_container, parseInt(select.value), b, new Date(date.value)));
 }
-function add_achat(modal_container, tarifs, tarif_id, billet) {
+function add_achat(modal_container, tarif_id, billet, date_visite) {
     const reservations_container = document.getElementById("reservation_column");
     if (!reservations_container) {
         console.log("nono");
@@ -95,6 +101,7 @@ function add_achat(modal_container, tarifs, tarif_id, billet) {
     achats.push({
         billet: billet,
         tarif_id: tarif_id,
+        date_visite,
     });
     document.body.classList.remove("modal-open");
     modal_container.remove();
@@ -148,7 +155,7 @@ async function post_achat() {
     if (achats.length <= 0)
         return;
     const achats_to_send = achats.map((a) => {
-        return { billet_id: a.billet.id, tarif_id: a.tarif_id };
+        return { billet_id: a.billet.id, tarif_id: a.tarif_id, date_visite: a.date_visite };
     });
     const response = await fetch("/user/payment", {
         method: "POST",

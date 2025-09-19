@@ -39,14 +39,14 @@ CREATE TABLE Tarif(
    id SERIAL PRIMARY KEY,
    coefficient_tarif NUMERIC(15,2) NOT NULL,
    titre_tarif VARCHAR(50) NOT NULL
-)
+);
 
 CREATE TABLE Reservation(
    id SERIAL PRIMARY KEY,
    date_reservation DATE NOT NULL,
    code_utilisateur INTEGER NOT NULL,
    FOREIGN KEY(code_utilisateur) REFERENCES Compte_utilisateur(id)
-)
+);
 
 CREATE TABLE inclure_billet(
    id SERIAL PRIMARY KEY,
@@ -58,4 +58,4 @@ CREATE TABLE inclure_billet(
    FOREIGN KEY (code_reservation) REFERENCES Reservation(id),
    FOREIGN KEY (code_billet) REFERENCES Billet(id),
    FOREIGN KEY (code_tarif) REFERENCES Tarif(id)
-)
+);

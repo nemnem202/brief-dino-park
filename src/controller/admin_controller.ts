@@ -100,21 +100,26 @@ export default class AdminController {
       if (dino_add) {
         const all_dino = await this.dino_repo.findAll();
         console.log("[UPDATE DINO] : ", all_dino);
-        return res.status(200).send({ message: dino });
+        return res.status(200).send({ message: "Dinosaur added successfully", data: dino });
       } else {
-        return res.status(500).send({ message: "erreur de la db" });
+        return res.status(500).send({ message: "Database error" });
       }
     } catch (err) {
-      console.error("[ERROR] : " + err);
+      console.error("[ERROR] :", err);
+
       if (err instanceof z.ZodError) {
         return res.status(400).send({
-          message: "Validation échouée",
-          errors: err.issues, // tableau brut
-          // ou si tu veux seulement les messages :
-          messages: err.issues.map((e) => e.message),
+          message: "Erreur de validation des champs",
+          errors: err.issues.map((e) => ({
+            field: e.path.join("."), // ex: "dinosaure_name"
+            message: e.message, // ex: "Le nom est requis"
+          })),
         });
       }
-      return res.status(400).send({ message: err });
+
+      return res.status(500).send({
+        message: err instanceof Error ? err.message : "Unexpected error",
+      });
     }
   }
 
@@ -170,32 +175,36 @@ export default class AdminController {
   static async remove_dino(req: Request, res: Response) {
     console.log("[REMOVE DINO ATTEMPT]");
     const id = req.params.id;
-    if (!id) return res.status(404);
 
-    this.dino_repo.get_prop_by_key(parseInt(id), "image_dinosaure_id").then(async (img_id) => {
-      if (!img_id) return res.status(400);
-      console.log("[REMOVE IMG ATTEMPT] : for", img_id);
-      const remove_img = await CloudinaryClient.getInstance().remove_img(img_id);
-      console.log("[REMOVE IMG] : ", remove_img);
-    });
-
-    const links = await this.voir_dino_repo.findAll();
-
-    if (links) {
-      console.log("[LINKS FOUND] :", links);
-      for (const l of links.filter((l) => String(l.code_dinosaure) === String(id))) {
-        console.log("[TRYING TO REMOVE]", id, "in", l);
-        await this.voir_dino_repo.remove_item(Number(l.id));
-      }
+    if (!id) {
+      return res.status(400).send({ message: "L'identifiant du dinosaure est requis" });
     }
 
-    const removed = await this.dino_repo.remove_item(parseInt(id));
-    if (removed) {
-      console.log("[DINOSAURE REMOVED] : ", id);
-      return res.status(200).send({ message: "dino removed !" });
-    } else {
-      console.log("[REMOVE DINO] : fail");
-      return res.status(400).send({ message: "an error occured" });
+    try {
+      const img_id = await this.dino_repo.get_prop_by_key(parseInt(id), "image_dinosaure_id");
+      if (img_id) {
+        console.log("[REMOVE IMG ATTEMPT] : for", img_id);
+        await CloudinaryClient.getInstance().remove_img(img_id);
+      }
+
+      const links = await this.voir_dino_repo.findAll();
+      if (links) {
+        for (const l of links.filter((l) => String(l.code_dinosaure) === String(id))) {
+          await this.voir_dino_repo.remove_item(Number(l.id));
+        }
+      }
+
+      const removed = await this.dino_repo.remove_item(parseInt(id));
+      if (removed) {
+        return res.status(200).send({ message: "Dinosaure supprimé avec succès" });
+      } else {
+        return res.status(404).send({ message: "Dinosaure introuvable" });
+      }
+    } catch (err) {
+      console.error("[ERROR REMOVE DINO] :", err);
+      return res.status(500).send({
+        message: err instanceof Error ? err.message : "Erreur inattendue lors de la suppression",
+      });
     }
   }
 
@@ -205,15 +214,13 @@ export default class AdminController {
   }
 
   static async billet_post(req: Request, res: Response) {
-    console.log("[BILLET POST REQUEST");
-
+    console.log("[BILLET POST REQUEST]");
     try {
       const img_properties = await this.handle_image(req);
       const parsed_body = this.billet_schema.parse(req.body);
 
       if (!img_properties) {
-        console.error("[IMAGE] : incorrect");
-        return res.status(400).send({ message: "Please enter a correct image" });
+        return res.status(400).send({ message: "Veuillez entrer une image correcte" });
       }
 
       const billet: BilletDTO = {
@@ -224,6 +231,7 @@ export default class AdminController {
         prix_billet: parsed_body.prix_billet,
         titre_billet: parsed_body.titre_billet,
       };
+
       const billet_add = await this.billet_repo.add_item(billet);
 
       if (billet_add) {
@@ -235,71 +243,66 @@ export default class AdminController {
           this.voir_dino_repo.add_item(item);
         });
 
-        console.log("[UPDATE BILLET] : ", billet_add);
-        return res.status(200).send({ message: billet });
+        return res.status(200).send({ message: "Billet créé avec succès", data: billet });
       } else {
-        return res.status(500).send({ message: "erreur de la db" });
+        return res.status(500).send({ message: "Erreur de la base de données" });
       }
     } catch (err) {
-      console.error("[ERROR] : " + err);
+      console.error("[ERROR BILLET POST] :", err);
       if (err instanceof z.ZodError) {
         return res.status(400).send({
-          message: "Validation échouée",
-          errors: err.issues, // tableau brut
-          // ou si tu veux seulement les messages :
-          messages: err.issues.map((e) => e.message),
+          message: "Erreur de validation des champs",
+          errors: err.issues.map((e) => ({
+            field: e.path.join("."),
+            message: e.message,
+          })),
         });
       }
-      return res.status(400).send({ message: err });
+      return res.status(500).send({
+        message: err instanceof Error ? err.message : "Erreur inattendue",
+      });
     }
   }
 
   static async remove_billet(req: Request, res: Response) {
     console.log("[REMOVE BILLET ATTEMPT]");
     const id = req.params.id;
-    if (!id) return res.status(404);
 
-    this.billet_repo.get_prop_by_key(parseInt(id), "image_billet_id").then(async (img_id) => {
-      if (!img_id) return;
-      console.log("[REMOVE IMG ATTEMPT] : for", img_id);
-      const remove_img = await CloudinaryClient.getInstance().remove_img(img_id);
-      console.log("[REMOVE IMG] : ", remove_img);
-    });
-
-    const links = await this.voir_dino_repo.findAll();
-
-    if (links) {
-      console.log("[LINKS FOUND] :", links);
-      for (const l of links.filter((l) => String(l.code_billet) === String(id))) {
-        console.log("[TRYING TO REMOVE]", id, "in", l);
-        await this.voir_dino_repo.remove_item(Number(l.id));
-      }
+    if (!id) {
+      return res.status(400).send({ message: "L'identifiant du billet est requis" });
     }
 
-    const inclure_billet_links = await this.inclure_billet_repo.findAll();
-
-    if (inclure_billet_links) {
-      console.log("[INCLURE BILLETS LINKS FOUND] :", inclure_billet_links);
-      for (const il of inclure_billet_links.filter((l) => String(l.code_billet) === String(id))) {
-        console.log("[TRYING TO REMOVE]", id, "in", il);
-        await this.inclure_billet_repo.remove_item(Number(il.id));
+    try {
+      const img_id = await this.billet_repo.get_prop_by_key(parseInt(id), "image_billet_id");
+      if (img_id) {
+        await CloudinaryClient.getInstance().remove_img(img_id);
       }
-    }
 
-    const removed = await this.billet_repo.remove_item(parseInt(id));
-
-    if (removed) {
-      console.log("[BILLET REMOVED] : ", id);
-      const all_voir_dino = await this.voir_dino_repo.findAll();
-      res.status(200).send({ message: "billet removed !" });
-      if (all_voir_dino) {
-        const voir_dino_for_billet = all_voir_dino.filter((e) => e.code_billet === id);
-        voir_dino_for_billet.forEach((e) =>
-          this.voir_dino_repo.remove_item(parseInt(String(e.id)))
-        );
+      const links = await this.voir_dino_repo.findAll();
+      if (links) {
+        for (const l of links.filter((l) => String(l.code_billet) === String(id))) {
+          await this.voir_dino_repo.remove_item(Number(l.id));
+        }
       }
-    } else {
-      return res.status(400).send({ message: "an error occured" });
+
+      const inclure_billet_links = await this.inclure_billet_repo.findAll();
+      if (inclure_billet_links) {
+        for (const il of inclure_billet_links.filter((l) => String(l.code_billet) === String(id))) {
+          await this.inclure_billet_repo.remove_item(Number(il.id));
+        }
+      }
+
+      const removed = await this.billet_repo.remove_item(parseInt(id));
+      if (removed) {
+        return res.status(200).send({ message: "Billet supprimé avec succès" });
+      } else {
+        return res.status(404).send({ message: "Billet introuvable" });
+      }
+    } catch (err) {
+      console.error("[ERROR REMOVE BILLET] :", err);
+      return res.status(500).send({
+        message: err instanceof Error ? err.message : "Erreur inattendue lors de la suppression",
+      });
     }
   }
 
@@ -318,17 +321,21 @@ export default class AdminController {
 
       const tarif_entity = await this.tarif_repo.add_item(tarif);
 
-      res.send({ message: tarif_entity });
+      return res.status(200).send({ message: "Tarif ajouté avec succès", data: tarif_entity });
     } catch (err) {
-      console.error("[ERROR] : " + err);
+      console.error("[ERROR TARIF POST] :", err);
       if (err instanceof z.ZodError) {
         return res.status(400).send({
-          message: "Validation échouée",
-          errors: err.issues,
-          messages: err.issues.map((e) => e.message),
+          message: "Erreur de validation des champs",
+          errors: err.issues.map((e) => ({
+            field: e.path.join("."),
+            message: e.message,
+          })),
         });
       }
-      return res.status(400).send({ message: err });
+      return res.status(500).send({
+        message: err instanceof Error ? err.message : "Erreur inattendue",
+      });
     }
   }
 
@@ -336,19 +343,21 @@ export default class AdminController {
     console.log("[TRY TO REMOVE TARIF]");
     const id = req.params.id;
 
-    if (!id) return res.status(404);
+    if (!id) {
+      return res.status(400).send({ message: "L'identifiant du tarif est requis" });
+    }
 
     try {
       const remove = await this.tarif_repo.remove_item(parseInt(id));
       if (!remove) {
-        console.log("[FAILED TO REMOVE]");
-        return res.status(404);
+        return res.status(404).send({ message: "Tarif introuvable" });
       }
-      console.log("[TARIF REMOVED SUCCESSFULLY]");
-      return res.status(200);
+      return res.status(200).send({ message: "Tarif supprimé avec succès" });
     } catch (err) {
-      console.log("[ERROR REMOVING THE TARIF]", err);
-      return res.status(500);
+      console.error("[ERROR REMOVE TARIF] :", err);
+      return res.status(500).send({
+        message: err instanceof Error ? err.message : "Erreur inattendue lors de la suppression",
+      });
     }
   }
 }

@@ -16,7 +16,8 @@ export default class Database {
         port: process.env.PGPORT ? parseInt(process.env.PGPORT, 10) : undefined,
         database: process.env.PGDATABASE,
       };
-      console.log("[POOL CONFIG] : ", pool_config);
+      console.log("[POOL CONFIG] : ");
+      console.table(pool_config);
       this.pool = new Pool(pool_config);
     }
 

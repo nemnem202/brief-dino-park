@@ -4,6 +4,10 @@
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"tsx watch src/core/app.ts\" \"npm run watch:frontend\" \"npm run scss:watch\"",
+    "build": "tsc -p tsconfig.json && npm run build:frontend && npm run copy:views && npm run build:scss",
+    "build:scss": "mkdir -p dist/public/stylesheets && sass src/views/stylesheets:dist/public/stylesheets --no-source-map",
+    "copy:views": "cpx \"src/views/**/*\" dist/views",
+    "start": "node dist/core/app.js",
     "build:frontend": "tsc -p tsconfig.frontend.json",
     "watch:frontend": "tsc -p tsconfig.frontend.json --watch",
     "scss:watch": "sass --watch src/views/stylesheets:public/stylesheets"
@@ -35,6 +39,7 @@
     "@types/pg": "^8.15.5",
     "@types/streamifier": "^0.1.2",
     "concurrently": "^9.2.1",
+    "cpx": "^1.5.0",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2"
   }

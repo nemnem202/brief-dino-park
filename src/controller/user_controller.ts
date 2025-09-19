@@ -2,11 +2,11 @@ import { Request, Response } from "express";
 import z from "zod";
 import { ReservationRepository } from "../repositories/reservation_repository";
 import { InclureBilletRepository } from "../repositories/inclure_billet_repository";
-import { ReservationDTO, ReservationENTITY } from "../types/models/reservation";
+import { ReservationDTO } from "../types/models/reservation";
 import { InclureBilletDTO } from "../types/models/inclure_billet";
 import { BilletRepository } from "../repositories/billet_repository";
-import Repository from "../libs/repository";
 import { TarifRepository } from "../repositories/tarif_repository";
+import { BilletEntity } from "../types/models/billet";
 
 export default class UserController {
   private static reservation_repo = new ReservationRepository();
@@ -25,12 +25,23 @@ export default class UserController {
         if (typeof val === "number") return String(val);
         return val;
       }, z.string()),
+
+      date_visite: z.preprocess((val) => {
+        if (typeof val === "string" || val instanceof Date) {
+          const date = new Date(val);
+          if (!isNaN(date.getTime())) {
+            return date;
+          }
+        }
+        return undefined; // provoque une erreur de validation
+      }, z.date()),
     })
   );
 
   static async post_reservation(req: Request, res: Response) {
     console.log("[POST RESERVATION REQUIRED]");
     try {
+      console.log(req.body.achats);
       const request_body = this.achat_schema.parse(req.body.achats);
       const user = req.user_id;
       console.log("[REQUEST] :", request_body);
@@ -85,6 +96,7 @@ export default class UserController {
           code_reservation: reservation_entity.id,
           code_billet: rb.billet_id,
           code_tarif: rb.tarif_id,
+          date_visite: rb.date_visite,
           prix_a_l_achat: prix,
         };
 
